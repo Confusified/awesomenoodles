@@ -28,7 +28,7 @@ return
 end
 
 local ScriptData = Instance.new("Folder",game)
-local Highlight = Instance.new("Highlight",ScriptData)
+local Highlight = Instance.new("Highlight")
 
 
 local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))

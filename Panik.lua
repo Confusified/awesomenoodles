@@ -1,9 +1,8 @@
 local settingsTable = {
-    ShowExit = true,
+    ShowExit = false,
     ShowHappy = false,
-    ShowAllItems = false,
     ShowNeededItems = false,
-    NoFog = true
+    NoFog = false
     }
 local fName = "ConConfigs"
 local FileName = "Panik.txt"
@@ -56,7 +55,7 @@ local exittoggle = sec:Toggle("Highlight Exits",settings.ShowExit,"Toggle",funct
         print("Highlighting Exits")
     else
             for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors"):GetChildren()) do
-                local ExitHighlight = ScriptData:FindFirstChild("Exit"..i)
+                local ExitHighlight = ScriptData:FindFirstChild(tostring("Exit"..i))
                 if ExitHighlight == nil then
                     print("Could not find highlight")
                     return

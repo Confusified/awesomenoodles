@@ -61,6 +61,7 @@ local exittoggle = sec:Toggle("Highlight Exits",settings.ShowExit,"Toggle",funct
                     print("Could not find highlight")
                     return
                 end
+            end
         ExitHighlight:Destroy()
         print("No longer highlighting Exits")
     end

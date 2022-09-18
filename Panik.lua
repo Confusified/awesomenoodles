@@ -50,12 +50,12 @@ local exittoggle = sec:Toggle("Highlight Exits",settings.ShowExit,"Toggle",funct
                 local ExitHighlight = Highlight:Clone()
                 ExitHighlight.Parent = ScriptData
                 ExitHighlight.Adornee = v
-                ExitHighlight.Name = "Exit"..i
+                ExitHighlight.Name = "Exit"
             end
         print("Highlighting Exits")
     else
             for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors"):GetChildren()) do
-                local ExitHighlight = ScriptData:FindFirstChild(tostring("Exit"..i))
+                local ExitHighlight = ScriptData:FindFirstChild("Exit")
                 if ExitHighlight == nil then
                     print("Could not find highlight")
                     return
@@ -97,4 +97,10 @@ local fogtoggle = sec:Toggle("Toggle Fog",settings.NoFog,"Toggle",function(a)
     if not settings.NoFog then
         game:GetService("Lighting").FogEnd = 1e2
     end
+end)
+
+local itemtoggle = sec:Toggle("Highlight Required Items",settings.ShowNeededItems,"Toggle",function(a)
+    settings.ShowNeededItems = a
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settings)) --update config
+    
 end)

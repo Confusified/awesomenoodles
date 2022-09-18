@@ -47,7 +47,7 @@ local exittoggle = sec:Toggle("Highlight Exits",settings.ShowExit,"Toggle",funct
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settings)) --update config
     
     if settings.ShowExit then
-            for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors")) do
+            for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors"):GetChildren()) do
                 local ExitHighlight = Highlight:Clone()
                 ExitHighlight.Parent = ScriptData
                 ExitHighlight.Adornee = v
@@ -55,7 +55,7 @@ local exittoggle = sec:Toggle("Highlight Exits",settings.ShowExit,"Toggle",funct
             end
         print("Highlighting Exits")
     else
-            for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors")) do
+            for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors"):GetChildren()) do
                 local ExitHighlight = ScriptData:FindFirstChild("Exit"..i)
                 if ExitHighlight == nil then
                     print("Could not find highlight")

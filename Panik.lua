@@ -27,4 +27,4 @@ end)
 end
 
 local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
-print("Settings have been loaded.")
+print("Settings have been loaded!")

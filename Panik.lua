@@ -55,12 +55,12 @@ local exittoggle = sec:Toggle("Highlight Exits",settings.ShowExit,"Toggle",funct
             end
         print("Highlighting Exits")
     else
-            for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors"))
-        local ExitHighlight = ScriptData:FindFirstChild("Exit"..i)
-        if ExitHighlight == nil then
-            print("Could not find highlight")
-            return
-        end
+            for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors")) do
+                local ExitHighlight = ScriptData:FindFirstChild("Exit"..i)
+                if ExitHighlight == nil then
+                    print("Could not find highlight")
+                    return
+                end
         ExitHighlight:Destroy()
         print("No longer highlighting Exits")
     end

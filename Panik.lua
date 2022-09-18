@@ -21,10 +21,10 @@ if game.PlaceId == 8511615377 then
     print("You are currently in the lobby, script has been queued for teleport.")
     game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
     if State == Enum.TeleportState.Started then
-        syn.queue_on_teleport(loadstring(game:HttpGet('https://raw.githubusercontent.com/Confusified/awesomenoodles/main/Panik.lua')))
+        syn.queue_on_teleport(loadstring(game:HttpGet('https://raw.githubusercontent.com/Confusified/awesomenoodles/main/Panik.lua'))())
     end
 end)
 end
 
 local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
-print("Settings have been loaded!")
+print("Settings have been fetched. Applying now.")

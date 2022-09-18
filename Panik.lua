@@ -21,7 +21,7 @@ if game.PlaceId == 8511615377 then
     print("You are currently in the lobby, script has been queued for teleport.")
     game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
     if State == Enum.TeleportState.Started then
-        syn.queue_on_teleport(loadstring(game:HttpGet('https://gist.githubusercontent.com/Confusified/13da12ee14c6d8b7e5e254e8368b2c94/raw/Panik.txt')))
+        syn.queue_on_teleport(loadstring(game:HttpGet('https://raw.githubusercontent.com/Confusified/awesomenoodles/main/Panik.lua')))
     end
 end)
 end

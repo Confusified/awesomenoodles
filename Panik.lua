@@ -27,6 +27,7 @@ return
 end
 
 local ScriptData = Instance.new("Folder",game)
+ScriptData.Name = "PanikGui_gc"
 local Highlight = Instance.new("Highlight")
 
 
@@ -37,6 +38,7 @@ local main = SolarisLib:New({
     Name = "Panik",
     FolderToSave = "SolarisLibStuff"
 })
+syn.protect_gui(main) --idk!!!!
 
 local tab = main:Tab("Main")
 local sec = tab:Section("Rendering")
@@ -53,16 +55,16 @@ local exittoggle = sec:Toggle("Highlight Exits",settings.ShowExit,"Toggle",funct
                 ExitHighlight.Name = "Exit"
             end
         print("Highlighting Exits")
-    else
+    elseif not settings.ShowExit then
             for i,v in ipairs(game:GetService("Workspace"):WaitForChild("Trapdoors"):GetChildren()) do
                 local ExitHighlight = ScriptData:FindFirstChild("Exit")
                 if ExitHighlight == nil then
                     print("Could not find highlight")
                     return
                 end
+                ExitHighlight:Destroy()
+                print("No longer highlighting Exits")
             end
-        ExitHighlight:Destroy()
-        print("No longer highlighting Exits")
     end
 end)
 local happytoggle = sec:Toggle("Highlight Happy",settings.ShowHappy,"Toggle",function(a)
@@ -72,7 +74,7 @@ local happytoggle = sec:Toggle("Highlight Happy",settings.ShowHappy,"Toggle",fun
     if settings.ShowHappy then
         local HappyHighlight = Highlight:Clone()
         HappyHighlight.Parent = ScriptData
-        HappyHighlight.Adornee = game:GetService("Workspace"):WaitForChild("MovingMop",1e9)
+        HappyHighlight.Adornee = game:GetService("Workspace"):WaitForChild("MovingMop") or game:GetService("Workspace"):WaitForChild("Happy")
         HappyHighlight.Name = "Happy"
         print("Highlighting Happy")
     else
@@ -102,5 +104,5 @@ end)
 local itemtoggle = sec:Toggle("Highlight Required Items",settings.ShowNeededItems,"Toggle",function(a)
     settings.ShowNeededItems = a
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settings)) --update config
-    
+    print("This is not a functional toggle, yet")
 end)

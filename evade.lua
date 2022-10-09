@@ -1,11 +1,13 @@
 local settingsTable = {
-    NextbotESP = true,
+   	NextbotESP = true,
 		NextbotESPColor = Color3.fromRGB(255,0,0),
     PlayerESP = true,
 		PlayerESPColor = Color3.fromRGB(0,0,255),
 		DownedESP = true,
 		DownedESPColor = Color3.fromRGB(255,155,0),
-		JumpCanBeHeld = false
+		JumpCanBeHeld = false,
+		RebelESP = true,
+		RebelESPColor = Color3.fromRGB(200,100,100)
 		
     }
 local fName = "ConConfigs"
@@ -20,7 +22,7 @@ if not isfile(fullFileName) or isfile(fullFileName) and readfile(fullFileName) =
     print("Configuration file for this game is missing or broken, creating a new one.")
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settingsTable))
 end
-
+local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
 
 local BadgeService = game:GetService("BadgeService")
 local GameFolder = game:GetService("Workspace"):WaitForChild("Game")
@@ -29,43 +31,43 @@ local GameStats = GameFolder:WaitForChild("Stats")
 
 local bots = {}
 for _,b in ipairs(WS_Players:GetChildren()) do
-print(b:GetAttribute("Downed"))
-if not b:FindFirstChild("Highlight") then
-    for i,v in ipairs(b:GetChildren()) do
-        if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
-            if not v:FindFirstChild("TorsoRot") then
-                table.insert(bots,v.Parent)
-                local a = Instance.new("Highlight",v.Parent)
-                a.Adornee = v
-                v.Transparency = 0
-                a.FillColor = Color3.fromRGB(255,0,0)
-                a.OutlineColor = Color3.fromRGB(200,0,0)
-                a.OutlineTransparency = 0.1
-            elseif b.Name ~= game:GetService("Players").LocalPlayer.Name then
-                local a = Instance.new("Highlight",v.Parent)
-                a.Adornee = v.Parent
-                if v.Parent.Name == "Rebel" then
-                    a.OutlineColor = Color3.fromRGB(255,0,0)
-                elseif v.Parent.Name == "Decoy" then
-                    a.OutlineColor = Color3.fromRGB(0,255,0)
-                end
-                a.FillTransparency = 1
-                a.OutlineColor = Color3.fromRGB(0,0,255)
-                a.OutlineTransparency = 0.1
-                
-                if b.Name ~= game:GetService("Players").LocalPlayer.Name and b.Name ~= "Decoy" and b.Name ~= "Rebel" then
-                    b.AttributeChanged:Connect(function()
-                        if b:GetAttribute("Downed") and b:FindFirstChild("Highlight") then
-                            b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(255,155,0)
-                        else
-                            b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(0,0,255)
-                        end
-                end)
-                end
-            end
-        end
-    end
-end
+	if not b:FindFirstChild("Highlight") then
+	    for i,v in ipairs(b:GetChildren()) do
+		if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
+		    if not v:FindFirstChild("TorsoRot") then
+						table.insert(bots,v.Parent)
+						local a = Instance.new("Highlight",v.Parent)
+						a.Adornee = v
+						v.Transparency = 0
+						a.OutlineColor = settings.NextbotESPColor
+						a.OutlineTransparency = 0.1
+						a.FillTransparency = 1
+				elseif b.Name ~= game:GetService("Players").LocalPlayer.Name then
+						local a = Instance.new("Highlight",v.Parent)
+						a.Adornee = v.Parent
+						a.FillTransparency = 1
+						a.OutlineTransparency = 0.1
+						if v.Parent.Name == "Rebel" then
+			    			a.OutlineColor = settings.RebelESPColor
+						elseif v.Parent.Name == "Decoy" then
+			    			a:Destroy()
+						else
+								a.OutlineColor = settings.PlayerESPColor
+						end
+					
+			if b.Name ~= game:GetService("Players").LocalPlayer.Name and b.Name ~= "Decoy" and b.Name ~= "Rebel" and not b:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
+			    b.AttributeChanged:Connect(function()
+				if b:GetAttribute("Downed") and b:FindFirstChild("Highlight") then
+				    b:FindFirstChild("Highlight").OutlineColor = settings.DownedESPColor
+				else
+				    b:FindFirstChild("Highlight").OutlineColor = settings.PlayerESPColor
+				end
+			end)
+			end
+		    end
+		end
+	    end
+	end
 end
 if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 		local MainGui = Instance.new("ScreenGui")

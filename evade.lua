@@ -22,19 +22,17 @@ if not isfile(fullFileName) or isfile(fullFileName) and readfile(fullFileName) =
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settingsTable))
 end
 local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
-print(settings.PlayerESPColor)
+
 local BadgeService = game:GetService("BadgeService")
 local GameFolder = game:GetService("Workspace"):WaitForChild("Game")
 local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
 
-local bots = {}
 for _,b in ipairs(WS_Players:GetChildren()) do
 	if not b:FindFirstChild("Highlight") then
 	    for i,v in ipairs(b:GetChildren()) do
 		if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
 		    if not v:FindFirstChild("TorsoRot") then
-						table.insert(bots,v.Parent)
 						local a = Instance.new("Highlight",v.Parent)
 						a.Adornee = v
 						v.Transparency = 0
@@ -54,7 +52,7 @@ for _,b in ipairs(WS_Players:GetChildren()) do
 						a.OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
 						end
 					
-			if b.Name ~= game:GetService("Players").LocalPlayer.Name and b.Name ~= "Decoy" and b.Name ~= "Rebel" and not b:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
+			if b.Name ~= game:GetService("Players").LocalPlayer.Name and b.Name ~= "Decoy" and b.Name ~= "Rebel" and b:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
 			    b.AttributeChanged:Connect(function()
 				if b:GetAttribute("Downed") and b:FindFirstChild("Highlight") then
 				    b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.DownedESPColor[1],settings.DownedESPColor[2],settings.DownedESPColor[3])

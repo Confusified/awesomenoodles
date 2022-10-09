@@ -27,6 +27,7 @@ local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName
 
 local BadgeService = game:GetService("BadgeService")
 local GameFolder = game:GetService("Workspace"):WaitForChild("Game")
+local MapFolder = GameFolder:WaitForChild("Map")
 local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
 
@@ -97,7 +98,7 @@ if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 		end);
 end
 
-local ObjectivesFolder = GameFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
+local ObjectivesFolder = MapFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
 if ObjectivesFolder then
 local Switch = ObjectivesFolder:FindFirstChild("Switch")
 if Switch then

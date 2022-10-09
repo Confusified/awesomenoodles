@@ -69,7 +69,7 @@ end
 if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 		local MainGui = Instance.new("ScreenGui")
 		MainGui.Name = "EvadeGui"
-		gethui(MainGui)
+		syn.protect_gui(MainGui)
 		MainGui.Parent = game:GetService("CoreGui")
 	
 		local TimeLeft = Instance.new("TextLabel",MainGui)
@@ -95,9 +95,8 @@ if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 		end);
 end
 
-local ObjectivesFolder = GameFolder:WaitForChild("Parts"):WaitForChild("Objectives")
+local ObjectivesFolder = GameFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
 if ObjectivesFolder then
-
-
+local Switch = ObjectivesFolder:FindFirstChild("Switch")
 
 end

@@ -103,7 +103,7 @@ local Switch = ObjectivesFolder:FindFirstChild("Switch")
 if Switch then
 local RealSwitch = Switch:WaitForChild("Switch")
 local a = Instance.new("Highlight",Switch.Parent)
-a.Adornee = RealSwitch.Parent
+a.Adornee = RealSwitch
 a.FillTransparency = 1
 a.OutlineTransparency = 0.1
 a.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])

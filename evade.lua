@@ -7,7 +7,9 @@ local settingsTable = {
 		DownedESPColor = {255,155,0},
 		JumpCanBeHeld = false,
 		RebelESP = true,
-		RebelESPColor = {200,100,100}	
+		RebelESPColor = {200,100,100},
+		ObjectiveESP = true,
+		ObjectiveESPColor = {200,0,255}
     }
 local fName = "ConConfigs"
 local FileName = "Evade.txt"
@@ -98,5 +100,11 @@ end
 local ObjectivesFolder = GameFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
 if ObjectivesFolder then
 local Switch = ObjectivesFolder:FindFirstChild("Switch")
-
+if Switch then
+local RealSwitch = Switch:WaitForChild("Switch")
+local a = Instance.new("Highlight",v.Parent)
+a.Adornee = v.Parent
+a.FillTransparency = 1
+a.OutlineTransparency = 0.1
+a.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])
 end

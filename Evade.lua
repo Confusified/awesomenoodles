@@ -11,7 +11,9 @@ local settingsTable = {
 		RebelESP = true,
 		RebelESPColor = '#C86464',
 		ObjectiveESP = true,
-		ObjectiveESPColor = '#C800FF'
+		ObjectiveESPColor = '#C800FF',
+		CustomFriendESP = true,
+		CustomFriendESPColor = '#00FF00'
     }
 local fName = "ConConfigs"
 local FileName = "Evade.txt"
@@ -28,16 +30,17 @@ end
 
 local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
 
-local BadgeService = game:GetService("BadgeService")
+local UIS = game:GetService("UserInputService")
 local GameFolder = game:GetService("Workspace"):WaitForChild("Game")
 local MapFolder = GameFolder:WaitForChild("Map")
 local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
 local function applyESP(child)
 		for i,v in ipairs(child:GetChildren()) do
-			if not child:FindFirstChild("Highlight") then
+			if not child:FindFirstChild("Highlight_ESP") then
 				if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
 					local a = Instance.new("Highlight",v.Parent)
+					a.Name = "Highlight_ESP"
 					a.FillTransparency = 1
 					a.OutlineTransparency = 0.1
 					if not v:FindFirstChild("TorsoRot") and settings.NextbotESP then
@@ -51,7 +54,11 @@ local function applyESP(child)
 						elseif v.Parent.Name == "Decoy" then
 							a:Destroy()
 						elseif settings.PlayerESP and child.Name ~= game:GetService("Players").LocalPlayer.Name then
-						a.OutlineColor = Color3.fromHex(settings.PlayerESPColor)
+						if game:GetService("Players"):FindFirstChild(child.Name):IsFriendsWith(game:GetService("Players").LocalPlayer.UserId) then
+							a.OutlineColor = Color3.fromHex(settings.CustomFriendESPColor)
+						else
+							a.OutlineColor = Color3.fromHex(settings.PlayerESPColor)
+						end
 						else
 							a:Destroy()
 						end
@@ -60,12 +67,16 @@ local function applyESP(child)
 			end
 				if child.Name ~= "Decoy" and child.Name ~= "Rebel" and child:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
 					child.AttributeChanged:Connect(function()
-						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
-							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.DownedESPColor)
-						elseif child:FindFirstChild("Highlight") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
-							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
+						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight_ESP") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
+							child:FindFirstChild("Highlight_ESP").OutlineColor = Color3.fromHex(settings.DownedESPColor)
+						elseif child:FindFirstChild("Highlight_ESP") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
+							if game:GetService("Players"):FindFirstChild(child.Name):IsFriendsWith(game:GetService("Players").LocalPlayer.UserId) then
+							child:FindFirstChild("Highlight_ESP").OutlineColor = Color3.fromHex(settings.CustomFriendESPColor)
+						else
+							child:FindFirstChild("Highlight_ESP").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
 						end
-						if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") then
+						end
+						if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") and settings.DownedTimer then
 								local bbg = Instance.new("BillboardGui",child)
 								bbg.Adornee = child:FindFirstChild("Head")
 								bbg.SizeOffset = Vector2.new(0,1.5)
@@ -89,7 +100,7 @@ local function applyESP(child)
 								updateReviveTimer()
 									
 								child:GetAttributeChangedSignal("ReviveTimeLeft"):Connect(function()
-									if child:GetAttribute("ReviveTimeLeft") == nil then
+									if child:GetAttribute("ReviveTimeLeft") == nil or not settings.DownedTimer then
 										bbg:Destroy()
 										return
 									end
@@ -147,20 +158,38 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 		toHighlight = v:WaitForChild("Diesel generator")
 	elseif v.Name == "Key" then
 		toHighlight = v:WaitForChild("Key")
+		if not v.Parent:WaitForChild("Doorway"):FindFirstChild("Highlight_ESP") then
 		local door = Instance.new("Highlight",v.Parent:WaitForChild("Doorway"))
+		door.Name = "Highlight_ESP"
 		door.Adornee = v.Parent:WaitForChild("Doorway"):WaitForChild("Door")
 		door.FillTransparency = 1
 		door.OutlineTransparency = 0.1
 		door.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
 	end
-	if toHighlight ~= nil then
+	if toHighlight ~= nil and v:FindFirstChild("Highlight_ESP") then
 		local a = Instance.new("Highlight",v)
+		a.Name = "Highlight_ESP"
 		a.Adornee = toHighlight
 		a.FillTransparency = 1
 		a.OutlineTransparency = 0.1
 		a.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
 	end
 end
+end
 else
 print("This map has no objectives or objective ESP is disabled.")
 end
+
+UIS.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld then
+		while settings.JumpCanBeHeld do
+			task.wait()
+			local Character = game:GetService("Players").LocalPlayer.Character
+			local Communicator = Character:FindFirstChild("Communicator")
+			if Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Landed then
+				Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+				task.wait()
+			end
+		end
+	end
+end)

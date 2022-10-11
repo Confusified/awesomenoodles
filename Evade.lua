@@ -32,12 +32,12 @@ local GameFolder = game:GetService("Workspace"):WaitForChild("Game")
 local MapFolder = GameFolder:WaitForChild("Map")
 local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
-
-for _,b in ipairs(WS_Players:GetChildren()) do
+local function applyESP()
+	for _,b in ipairs(WS_Players:GetChildren()) do
 	if not b:FindFirstChild("Highlight") then
 	    for i,v in ipairs(b:GetChildren()) do
 		if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
-		    if not v:FindFirstChild("TorsoRot") then
+		    if not v:FindFirstChild("TorsoRot") and settings.NextbotESP then
 						local a = Instance.new("Highlight",v.Parent)
 						a.Adornee = v
 						v.Transparency = 0
@@ -49,11 +49,11 @@ for _,b in ipairs(WS_Players:GetChildren()) do
 						a.Adornee = v.Parent
 						a.FillTransparency = 1
 						a.OutlineTransparency = 0.1
-						if v.Parent.Name == "Rebel" then
+						if v.Parent.Name == "Rebel" and settings.RebelESP then
 			    			a.OutlineColor = Color3.fromRGB(settings.RebelESPColor[1],settings.RebelESPColor[2],settings.RebelESPColor[3])
 						elseif v.Parent.Name == "Decoy" then
 			    			a:Destroy()
-						else
+						elseif settings.PlayerESP then
 						a.OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
 						end
 					
@@ -100,6 +100,11 @@ for _,b in ipairs(WS_Players:GetChildren()) do
 	    end
 	end
 end
+end
+
+applyESP()
+WS_Players.ChildAdded:Connect(applyESP)
+
 if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 		local MainGui = Instance.new("ScreenGui")
 		MainGui.Name = "EvadeGui"
@@ -130,7 +135,7 @@ if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 end
 
 local ObjectivesFolder = MapFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
-if ObjectivesFolder then
+if ObjectivesFolder and settings.ObjectiveESP then
 for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 	local toHighlight = nil
 	if v.Name == "Switch" then

@@ -1,5 +1,6 @@
 local settingsTable = {
 		JumpCanBeHeld = false,
+		AutoStrafe = false,
 		GameTimer = true,
    		NextbotESP = true,
 		NextbotESPColor = '#FF0000',
@@ -33,34 +34,38 @@ local MapFolder = GameFolder:WaitForChild("Map")
 local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
 local function applyESP(child)
-	if not child:FindFirstChild("Highlight") then
 		for i,v in ipairs(child:GetChildren()) do
-			if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
-				local a = Instance.new("Highlight",v.Parent)
-				a.FillTransparency = 1
-				a.OutlineTransparency = 0.1
-				if not v:FindFirstChild("TorsoRot") and settings.NextbotESP then
-					a.Adornee = v
-					v.Transparency = 0
-					a.OutlineColor = Color3.fromHex(settings.NextbotESPColor)
-				else
-					a.Adornee = v.Parent
-					if v.Parent.Name == "Rebel" and settings.RebelESP then
-						a.OutlineColor = Color3.fromHex(settings.RebelESPColor)
-					elseif v.Parent.Name == "Decoy" then
-						a:Destroy()
-					elseif settings.PlayerESP then
-					a.OutlineColor = Color3.fromHex(settings.PlayerESPColor)
-					else
-						a:Destroy()
+			if not child:FindFirstChild("Highlight") then
+				if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
+					local a = Instance.new("Highlight",v.Parent)
+					a.FillTransparency = 1
+					a.OutlineTransparency = 0.1
+					if not v:FindFirstChild("TorsoRot") and settings.NextbotESP then
+						a.Adornee = v
+						v.Transparency = 0
+						a.OutlineColor = Color3.fromHex(settings.NextbotESPColor)
+					elseif child.Name ~= game:GetService("Players").LocalPlayer.Name
+						a.Adornee = v.Parent
+						if v.Parent.Name == "Rebel" and settings.RebelESP then
+							a.OutlineColor = Color3.fromHex(settings.RebelESPColor)
+						elseif v.Parent.Name == "Decoy" then
+							a:Destroy()
+						elseif settings.PlayerESP then
+						a.OutlineColor = Color3.fromHex(settings.PlayerESPColor)
+						else
+							a:Destroy()
+						end
 					end
 				end
-			
+			end
 				if child.Name ~= "Decoy" and child.Name ~= "Rebel" and child:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
 					child.AttributeChanged:Connect(function()
 						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight") then
 							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.DownedESPColor)
-							if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") then
+						elseif child:FindFirstChild("Highlight")
+							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
+						end
+						if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") then
 								local bbg = Instance.new("BillboardGui",child)
 								bbg.Adornee = child:FindFirstChild("Head")
 								bbg.SizeOffset = Vector2.new(0,1.5)
@@ -91,33 +96,20 @@ local function applyESP(child)
 									updateReviveTimer()
 								end)
 							end
-						else
-							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
-						end
 					end)
 				end
 		    end
 		end
-	end
 end
 
 for _,child in ipairs(WS_Players:GetChildren()) do
-    if child.Name ~= game:GetService("Players").LocalPlayer.Name then
 	    applyESP(child)
-	end
 end
-
---[[WS_Players.ChildAdded:Connect(function(child)
-    task.wait()
-    if child.Name ~= game:GetService("Players").LocalPlayer.Name then
-        applyESP(child)
-    end
-end)]]
 
 if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 		local MainGui = Instance.new("ScreenGui")
 		MainGui.Name = "EvadeGui"
-		syn.protect_gui(MainGui)
+		syn.protect_gui(MainGui) --compatibility with v2
 		MainGui.Parent = game:GetService("CoreGui")
 	
 		local TimeLeft = Instance.new("TextLabel",MainGui)

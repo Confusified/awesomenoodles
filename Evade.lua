@@ -132,15 +132,21 @@ end
 local ObjectivesFolder = MapFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
 if ObjectivesFolder then
 for i,v in ipairs(ObjectivesFolder:GetChildren()) do
+	local toHighlight = nil
 	if v.Name == "Switch" then
-	local toHighlight = v:WaitForChild("Switch")
-	elseif v.Name == "Transportation" or v.Name == "Generator" then
-	local toHighlight = v:WaitForChild("Part")
-	local a = Instance.new("Highlight",v)
-	a.Adornee = toHighlight
-	a.FillTransparency = 1
-	a.OutlineTransparency = 0.1
-	a.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])
+		local toHighlight = v:WaitForChild("Switch")
+	elseif v.Name == "Transportation" then
+		toHighlight = v:WaitForChild("Part")
+	
+	elseif v.Name == "Generator" then
+		toHighlight = v:WaitForChild("Diesel generator")
+	end
+	if toHighlight ~= nil then
+		local a = Instance.new("Highlight",v)
+		a.Adornee = toHighlight
+		a.FillTransparency = 1
+		a.OutlineTransparency = 0.1
+		a.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])	
 	end
 end
 end

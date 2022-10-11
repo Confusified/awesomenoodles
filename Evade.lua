@@ -137,3 +137,4 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 	a.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])
 	end
 end
+end

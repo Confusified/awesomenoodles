@@ -71,17 +71,20 @@ for _,b in ipairs(WS_Players:GetChildren()) do
 						fr.BackgroundTransparency = 1
 					       	fr.Font = Enum.Font.GothamBold
 					       	fr.TextScaled = true
+						fr.TextColor3 = Color3.new(1,1,1)
+						fr.TextStrokeTransparency = 0.9
+						fr.TextStrokeColor3 = Color3.new(0,0,0)
 					       	
 					       	local function updateReviveTimer()
-					       	    fr.Text = math.floor(b:GetAttribute("ReviveTimeLeft"))
+						if b:GetAttribute("ReviveTimeLeft") then
+					       	    	fr.Text = math.floor(b:GetAttribute("ReviveTimeLeft"))
 					       	end
+						end
 					       	
 					       	updateReviveTimer()
 					       	
 					       	b:GetAttributeChangedSignal("ReviveTimeLeft"):Connect(function()
-						if b:GetAttribute("ReviveTimeLeft") then
 				                updateReviveTimer()
-						end
 					       	end);
                     			end
 				else

@@ -44,7 +44,7 @@ local function applyESP(child)
 						a.Adornee = v
 						v.Transparency = 0
 						a.OutlineColor = Color3.fromHex(settings.NextbotESPColor)
-					elseif child.Name ~= game:GetService("Players").LocalPlayer.Name
+					elseif child.Name ~= game:GetService("Players").LocalPlayer.Name then
 						a.Adornee = v.Parent
 						if v.Parent.Name == "Rebel" and settings.RebelESP then
 							a.OutlineColor = Color3.fromHex(settings.RebelESPColor)
@@ -62,7 +62,7 @@ local function applyESP(child)
 					child.AttributeChanged:Connect(function()
 						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight") then
 							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.DownedESPColor)
-						elseif child:FindFirstChild("Highlight")
+						elseif child:FindFirstChild("Highlight") then
 							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
 						end
 						if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") then
@@ -95,12 +95,11 @@ local function applyESP(child)
 									end
 									updateReviveTimer()
 								end)
-							end
+						end
 					end)
 				end
 		    end
 		end
-end
 
 for _,child in ipairs(WS_Players:GetChildren()) do
 	    applyESP(child)
@@ -160,9 +159,6 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 		a.FillTransparency = 1
 		a.OutlineTransparency = 0.1
 		a.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
-	    local b = a:Clone()
-	    b.Parent = v.Parent.Doorway.Door
-	    b.Adornee = v.Parent.Doorway.Door
 	end
 end
 else

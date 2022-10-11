@@ -134,7 +134,7 @@ if ObjectivesFolder then
 for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 	if v.Name == "Switch" then
 	local toHighlight = v:WaitForChild("Switch")
-	elseif v.Name == "Transportation" then
+	elseif v.Name == "Transportation" or v.Name == "Generator" then
 	local toHighlight = v:WaitForChild("Part")
 	local a = Instance.new("Highlight",v)
 	a.Adornee = toHighlight

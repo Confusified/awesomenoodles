@@ -78,8 +78,10 @@ for _,b in ipairs(WS_Players:GetChildren()) do
 					       	
 					       	updateReviveTimer()
 					       	
-					       	workspace.Game.Stats:GetAttributeChangedSignal("TimeRemaining"):Connect(function()
+					       	b:GetAttributeChangedSignal("ReviveTimeLeft"):Connect(function()
+						if b:GetAttribute("ReviveTimeLeft") then
 				                updateReviveTimer()
+						end
 					       	end);
                     			end
 				else

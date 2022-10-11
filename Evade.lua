@@ -60,9 +60,9 @@ local function applyESP(child)
 			end
 				if child.Name ~= "Decoy" and child.Name ~= "Rebel" and child:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
 					child.AttributeChanged:Connect(function()
-						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight") then
+						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
 							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.DownedESPColor)
-						elseif child:FindFirstChild("Highlight") then
+						elseif child:FindFirstChild("Highlight") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
 							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
 						end
 						if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") then

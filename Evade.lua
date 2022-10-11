@@ -84,6 +84,9 @@ for _,b in ipairs(WS_Players:GetChildren()) do
 					       	updateReviveTimer()
 					       	
 					       	b:GetAttributeChangedSignal("ReviveTimeLeft"):Connect(function()
+						if b:GetAttribute("ReviveTimeLeft") == nil then
+						bbg:Destroy()
+						return end
 				                updateReviveTimer()
 					       	end);
                     			end

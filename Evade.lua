@@ -66,14 +66,14 @@ for _,b in ipairs(WS_Players:GetChildren()) do
 					       	bbg.Adornee = b:FindFirstChild("Head")
 					       	bbg.SizeOffset = Vector2.new(0,1.5)
 						bbg.Size = UDim2.new(2,0,1,0)
-					       	bbg.AlwaysOnTop = true
 					       	local fr = Instance.new("TextLabel",bbg)
 					       	fr.Size = UDim2.new(1,0,1,0)
+						fr.BackgroundTransparency = 1
 					       	fr.Font = Enum.Font.GothamBold
 					       	fr.TextScaled = true
 					       	
 					       	local function updateReviveTimer()
-					       	    fr.Text = math.ceil(b:GetAttribute("ReviveTimeLeft"))
+					       	    fr.Text = math.floor(b:GetAttribute("ReviveTimeLeft"))
 					       	end
 					       	
 					       	updateReviveTimer()
@@ -123,13 +123,15 @@ end
 
 local ObjectivesFolder = MapFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
 if ObjectivesFolder then
-local Switch = ObjectivesFolder:FindFirstChild("Switch")
-if Switch then
-local RealSwitch = Switch:WaitForChild("Switch")
-local a = Instance.new("Highlight",Switch.Parent)
-a.Adornee = RealSwitch
-a.FillTransparency = 1
-a.OutlineTransparency = 0.1
-a.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])
-end
+for i,v in ipairs(ObjectivesFolder:GetChildren()) do
+	if v.Name == "Switch" then
+	local toHighlight = v:WaitForChild("Switch")
+	elseif v.Name == "Transportation" then
+	local toHighlight = v:WaitForChild("Part")
+	local a = Instance.new("Highlight",v)
+	a.Adornee = toHighlight
+	a.FillTransparency = 1
+	a.OutlineTransparency = 0.1
+	a.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])
+	end
 end

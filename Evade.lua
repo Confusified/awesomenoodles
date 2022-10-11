@@ -2,15 +2,15 @@ local settingsTable = {
 		JumpCanBeHeld = false,
 		GameTimer = true,
    		NextbotESP = true,
-		NextbotESPColor = {255,0,0},
+		NextbotESPColor = '#FF0000',
 		PlayerESP = true,
-		PlayerESPColor = {0,0,255},
-		DownedESPColor = {255,155,0},
+		PlayerESPColor = '#0000FF',
+		DownedESPColor = '#FF9B00',
 		DownedTimer = true,
 		RebelESP = true,
-		RebelESPColor = {200,100,100},
+		RebelESPColor = '#C86464',
 		ObjectiveESP = true,
-		ObjectiveESPColor = {200,0,255}
+		ObjectiveESPColor = '#C800FF'
     }
 local fName = "ConConfigs"
 local FileName = "Evade.txt"
@@ -42,15 +42,15 @@ local function applyESP(child)
 				if not v:FindFirstChild("TorsoRot") and settings.NextbotESP then
 					a.Adornee = v
 					v.Transparency = 0
-					a.OutlineColor = Color3.fromRGB(settings.NextbotESPColor[1],settings.NextbotESPColor[2],settings.NextbotESPColor[3])
+					a.OutlineColor = Color3.fromHex(settings.NextbotESPColor)
 				else
 					a.Adornee = v.Parent
 					if v.Parent.Name == "Rebel" and settings.RebelESP then
-						a.OutlineColor = Color3.fromRGB(settings.RebelESPColor[1],settings.RebelESPColor[2],settings.RebelESPColor[3])
+						a.OutlineColor = Color3.fromHex(settings.RebelESPColor)
 					elseif v.Parent.Name == "Decoy" then
 						a:Destroy()
 					elseif settings.PlayerESP then
-					a.OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
+					a.OutlineColor = Color3.fromHex(settings.PlayerESPColor)
 					else
 						a:Destroy()
 					end
@@ -59,7 +59,7 @@ local function applyESP(child)
 				if child.Name ~= "Decoy" and child.Name ~= "Rebel" and child:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
 					child.AttributeChanged:Connect(function()
 						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight") then
-							child:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.DownedESPColor[1],settings.DownedESPColor[2],settings.DownedESPColor[3])
+							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.DownedESPColor)
 							if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") then
 								local bbg = Instance.new("BillboardGui",child)
 								bbg.Adornee = child:FindFirstChild("Head")
@@ -92,7 +92,7 @@ local function applyESP(child)
 								end)
 							end
 						else
-							child:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
+							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
 						end
 					end)
 				end
@@ -107,8 +107,8 @@ for _,child in ipairs(WS_Players:GetChildren()) do
 	end
 end
 
--[[WS_Players.ChildAdded:Connect(function(child)
-    repeat task.wait() until #child:GetChildren() >= 5
+--[[WS_Players.ChildAdded:Connect(function(child)
+    task.wait()
     if child.Name ~= game:GetService("Players").LocalPlayer.Name then
         applyESP(child)
     end
@@ -160,14 +160,14 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 		door.Adornee = v.Parent:WaitForChild("Doorway"):WaitForChild("Door")
 		door.FillTransparency = 1
 		door.OutlineTransparency = 0.1
-		door.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])	
+		door.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
 	end
 	if toHighlight ~= nil then
 		local a = Instance.new("Highlight",v)
 		a.Adornee = toHighlight
 		a.FillTransparency = 1
 		a.OutlineTransparency = 0.1
-		a.OutlineColor = Color3.fromRGB(settings.ObjectiveESPColor[1],settings.ObjectiveESPColor[2],settings.ObjectiveESPColor[3])	
+		a.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
 	    local b = a:Clone()
 	    b.Parent = v.Parent.Doorway.Door
 	    b.Adornee = v.Parent.Doorway.Door

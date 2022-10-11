@@ -1,11 +1,13 @@
 local settingsTable = {
+		JumpCanBeHeld = false,
+		GameTimer = true,
    		NextbotESP = true,
 		NextbotESPColor = {255,0,0},
        		PlayerESP = true,
 		PlayerESPColor = {0,0,255},
 		DownedESP = true,
 		DownedESPColor = {255,155,0},
-		JumpCanBeHeld = false,
+		DownedTimer = true,
 		RebelESP = true,
 		RebelESPColor = {200,100,100},
 		ObjectiveESP = true,
@@ -59,6 +61,27 @@ for _,b in ipairs(WS_Players:GetChildren()) do
 			    b.AttributeChanged:Connect(function()
 				if b:GetAttribute("Downed") and b:FindFirstChild("Highlight") then
 				    b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.DownedESPColor[1],settings.DownedESPColor[2],settings.DownedESPColor[3])
+					if b:GetAttribute("ReviveTimeLeft") and not b:FindFirstChild("BillboardGui") then
+                       				local bbg = Instance.new("BillboardGui",b)
+					       	bbg.Adornee = b:FindFirstChild("Head")
+					       	bbg.SizeOffset = Vector2.new(0,1.5)
+						bbg.Size = UDim2.new(2,0,1,0)
+					       	bbg.AlwaysOnTop = true
+					       	local fr = Instance.new("TextLabel",bbg)
+					       	fr.Size = UDim2.new(1,0,1,0)
+					       	fr.Font = Enum.Font.GothamBold
+					       	fr.TextScaled = true
+					       	
+					       	local function updateReviveTimer()
+					       	    fr.Text = math.ceil(b:GetAttribute("ReviveTimeLeft"))
+					       	end
+					       	
+					       	updateReviveTimer()
+					       	
+					       	workspace.Game.Stats:GetAttributeChangedSignal("TimeRemaining"):Connect(function()
+				                updateReviveTimer()
+					       	end);
+                    			end
 				else
 				    b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
 				end

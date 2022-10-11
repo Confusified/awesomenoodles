@@ -44,13 +44,13 @@ local function applyESP(child)
 						a.Adornee = v
 						v.Transparency = 0
 						a.OutlineColor = Color3.fromHex(settings.NextbotESPColor)
-					elseif child.Name ~= game:GetService("Players").LocalPlayer.Name then
+					else
 						a.Adornee = v.Parent
 						if v.Parent.Name == "Rebel" and settings.RebelESP then
 							a.OutlineColor = Color3.fromHex(settings.RebelESPColor)
 						elseif v.Parent.Name == "Decoy" then
 							a:Destroy()
-						elseif settings.PlayerESP then
+						elseif settings.PlayerESP and child.Name ~= game:GetService("Players").LocalPlayer.Name then
 						a.OutlineColor = Color3.fromHex(settings.PlayerESPColor)
 						else
 							a:Destroy()

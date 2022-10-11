@@ -3,9 +3,8 @@ local settingsTable = {
 		GameTimer = true,
    		NextbotESP = true,
 		NextbotESPColor = {255,0,0},
-       		PlayerESP = true,
+       	PlayerESP = true,
 		PlayerESPColor = {0,0,255},
-		DownedESP = true,
 		DownedESPColor = {255,155,0},
 		DownedTimer = true,
 		RebelESP = true,
@@ -19,12 +18,13 @@ local fullFileName = fName.."\\"..FileName
 
 if not isfolder(fName) then
     print("Could not find configuration folder, creating a new one.")
-   makefolder(fName) 
+    makefolder(fName) 
 end
 if not isfile(fullFileName) or isfile(fullFileName) and readfile(fullFileName) == "" then
     print("Configuration file for this game is missing or broken, creating a new one.")
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settingsTable))
 end
+
 local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
 
 local BadgeService = game:GetService("BadgeService")
@@ -34,72 +34,76 @@ local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
 local function applyESP()
 	for _,b in ipairs(WS_Players:GetChildren()) do
-	if not b:FindFirstChild("Highlight") then
-	    for i,v in ipairs(b:GetChildren()) do
-		if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
-		    if not v:FindFirstChild("TorsoRot") and settings.NextbotESP then
+		if not b:FindFirstChild("Highlight") then
+			for i,v in ipairs(b:GetChildren()) do
+				if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
+					if not v:FindFirstChild("TorsoRot") and settings.NextbotESP then
 						local a = Instance.new("Highlight",v.Parent)
 						a.Adornee = v
 						v.Transparency = 0
 						a.OutlineColor = Color3.fromRGB(settings.NextbotESPColor[1],settings.NextbotESPColor[2],settings.NextbotESPColor[3])
 						a.OutlineTransparency = 0.1
 						a.FillTransparency = 1
-				elseif b.Name ~= game:GetService("Players").LocalPlayer.Name then
+					elseif b.Name ~= game:GetService("Players").LocalPlayer.Name then
 						local a = Instance.new("Highlight",v.Parent)
 						a.Adornee = v.Parent
 						a.FillTransparency = 1
 						a.OutlineTransparency = 0.1
 						if v.Parent.Name == "Rebel" and settings.RebelESP then
-			    			a.OutlineColor = Color3.fromRGB(settings.RebelESPColor[1],settings.RebelESPColor[2],settings.RebelESPColor[3])
+							a.OutlineColor = Color3.fromRGB(settings.RebelESPColor[1],settings.RebelESPColor[2],settings.RebelESPColor[3])
 						elseif v.Parent.Name == "Decoy" then
-			    			a:Destroy()
+							a:Destroy()
 						elseif settings.PlayerESP then
-						a.OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
+							a.OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
+						else
+							a:Destroy()
 						end
+					end
 					
-			if b.Name ~= game:GetService("Players").LocalPlayer.Name and b.Name ~= "Decoy" and b.Name ~= "Rebel" and b:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
-			    b.AttributeChanged:Connect(function()
-				if b:GetAttribute("Downed") and b:FindFirstChild("Highlight") then
-				    b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.DownedESPColor[1],settings.DownedESPColor[2],settings.DownedESPColor[3])
-					if b:GetAttribute("ReviveTimeLeft") and not b:FindFirstChild("BillboardGui") then
-                       				local bbg = Instance.new("BillboardGui",b)
-					       	bbg.Adornee = b:FindFirstChild("Head")
-					       	bbg.SizeOffset = Vector2.new(0,1.5)
-						bbg.Size = UDim2.new(2,0,1,0)
-					       	local fr = Instance.new("TextLabel",bbg)
-					       	fr.Size = UDim2.new(1,0,1,0)
-						fr.BackgroundTransparency = 1
-					       	fr.Font = Enum.Font.GothamBold
-					       	fr.TextScaled = true
-						fr.TextColor3 = Color3.new(1,1,1)
-						fr.TextStrokeTransparency = 0.9
-						fr.TextStrokeColor3 = Color3.new(0,0,0)
-					       	
-					       	local function updateReviveTimer()
-						if b:GetAttribute("ReviveTimeLeft") then
-					       	    	fr.Text = math.floor(b:GetAttribute("ReviveTimeLeft"))
-					       	end
+				if b.Name ~= game:GetService("Players").LocalPlayer.Name and b.Name ~= "Decoy" and b.Name ~= "Rebel" and b:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
+					b.AttributeChanged:Connect(function()
+						if b:GetAttribute("Downed") and b:FindFirstChild("Highlight") then
+							b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.DownedESPColor[1],settings.DownedESPColor[2],settings.DownedESPColor[3])
+							if b:GetAttribute("ReviveTimeLeft") and not b:FindFirstChild("BillboardGui") then
+								local bbg = Instance.new("BillboardGui",b)
+								bbg.Adornee = b:FindFirstChild("Head")
+								bbg.SizeOffset = Vector2.new(0,1.5)
+								bbg.Size = UDim2.new(2,0,1,0)
+								
+								local fr = Instance.new("TextLabel",bbg)
+								fr.Size = UDim2.new(1,0,1,0)
+								fr.BackgroundTransparency = 1
+								fr.Font = Enum.Font.GothamBold
+								fr.TextScaled = true
+								fr.TextColor3 = Color3.new(1,1,1)
+								fr.TextStrokeTransparency = 0.9
+								fr.TextStrokeColor3 = Color3.new(0,0,0)
+									
+								local function updateReviveTimer()
+									if b:GetAttribute("ReviveTimeLeft") then
+										fr.Text = math.floor(b:GetAttribute("ReviveTimeLeft"))
+									end
+								end
+								
+								updateReviveTimer()
+									
+								b:GetAttributeChangedSignal("ReviveTimeLeft"):Connect(function()
+									if b:GetAttribute("ReviveTimeLeft") == nil then
+										bbg:Destroy()
+										return
+									end
+									updateReviveTimer()
+								end)
+							end
+						else
+							b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
 						end
-					       	
-					       	updateReviveTimer()
-					       	
-					       	b:GetAttributeChangedSignal("ReviveTimeLeft"):Connect(function()
-						if b:GetAttribute("ReviveTimeLeft") == nil then
-						bbg:Destroy()
-						return end
-				                updateReviveTimer()
-					       	end);
-                    			end
-				else
-				    b:FindFirstChild("Highlight").OutlineColor = Color3.fromRGB(settings.PlayerESPColor[1],settings.PlayerESPColor[2],settings.PlayerESPColor[3])
+					end)
 				end
-			end)
-			end
 		    end
 		end
 	    end
 	end
-end
 end
 
 applyESP()

@@ -1,5 +1,5 @@
 local settingsTable = {
-		Version = '0.1c',
+		Version = '0.1d',
 		JumpCanBeHeld = false,
 		AutoStrafe = false,
 		GameTimer = true,

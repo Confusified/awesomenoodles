@@ -1,4 +1,5 @@
 local settingsTable = {
+		Version = '0.1c',
 		JumpCanBeHeld = false,
 		AutoStrafe = false,
 		GameTimer = true,
@@ -8,8 +9,8 @@ local settingsTable = {
 		PlayerESPColor = '#0000FF',
 		DownedESPColor = '#FF9B00',
 		DownedTimer = true,
-		RebelESP = true,
 		RebelESPColor = '#C86464',
+		RebelESP = true,
 		ObjectiveESP = true,
 		ObjectiveESPColor = '#C800FF',
 		CustomFriendESP = true,
@@ -30,17 +31,32 @@ end
 
 local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
 
+if settings.Version == nil or settings.Version ~= settingsTable.Version then
+print("Using outdated version!")
+	for i,v in pairs(settingsTable) do
+    	if settings[i] == nil then
+            settings[i] = v
+			print(tostring(i).." was not found in config, setting to "..tostring(v))
+		elseif i == "Version" then
+			print("Updating version (from "..settings[i].." to "..settingsTable[i]..")")
+            settings[i] = settingsTable[i]
+        end
+	end
+	writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settings))
+	print("Updated config file")
+end
+
 local UIS = game:GetService("UserInputService")
 local GameFolder = game:GetService("Workspace"):WaitForChild("Game")
+local RagdollFolder = GameFolder:WaitForChild("Effects"):WaitForChild("Ragdolls")
 local MapFolder = GameFolder:WaitForChild("Map")
 local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
 local function applyESP(child)
 		for i,v in ipairs(child:GetChildren()) do
-			if not child:FindFirstChild("Highlight_ESP") then
+			if not child:FindFirstChild("Highlight") then
 				if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
 					local a = Instance.new("Highlight",v.Parent)
-					a.Name = "Highlight_ESP"
 					a.FillTransparency = 1
 					a.OutlineTransparency = 0.1
 					if not v:FindFirstChild("TorsoRot") and settings.NextbotESP then
@@ -65,15 +81,15 @@ local function applyESP(child)
 					end
 				end
 			end
-				if child.Name ~= "Decoy" and child.Name ~= "Rebel" and child:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
+				if child.Name ~= "Decoy" and child.Name ~= "Rebel" and child:FindFirstChild("HumanoidRootPart") and child:FindFirstChild("HumanoidRootPart"):FindFirstChild("TorsoRot") then
 					child.AttributeChanged:Connect(function()
-						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight_ESP") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
-							child:FindFirstChild("Highlight_ESP").OutlineColor = Color3.fromHex(settings.DownedESPColor)
-						elseif child:FindFirstChild("Highlight_ESP") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
+						if child:GetAttribute("Downed") and child:FindFirstChild("Highlight") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
+							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.DownedESPColor)
+						elseif child:FindFirstChild("Highlight") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
 							if game:GetService("Players"):FindFirstChild(child.Name):IsFriendsWith(game:GetService("Players").LocalPlayer.UserId) then
-							child:FindFirstChild("Highlight_ESP").OutlineColor = Color3.fromHex(settings.CustomFriendESPColor)
+							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.CustomFriendESPColor)
 						else
-							child:FindFirstChild("Highlight_ESP").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
+							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
 						end
 						end
 						if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") and settings.DownedTimer then
@@ -110,10 +126,22 @@ local function applyESP(child)
 					end)
 				end
 		    end
+			
 		end
 
 for _,child in ipairs(WS_Players:GetChildren()) do
 	    applyESP(child)
+end
+for _,child in ipairs(RagdollFolder:GetChildren()) do
+	local function checkForHighlight()
+		if child:FindFirstChild("Highlight") then
+			child:FindFirstChild("Highlight"):Destroy()
+		end
+	end
+	
+	checkForHighlight()
+	
+	RagdollFolder.ChildAdded:Connect(checkForHighlight)
 end
 
 if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
@@ -158,17 +186,15 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 		toHighlight = v:WaitForChild("Diesel generator")
 	elseif v.Name == "Key" then
 		toHighlight = v:WaitForChild("Key")
-		if not v.Parent:WaitForChild("Doorway"):FindFirstChild("Highlight_ESP") then
+		if not v.Parent:WaitForChild("Doorway"):FindFirstChild("Highlight") then
 		local door = Instance.new("Highlight",v.Parent:WaitForChild("Doorway"))
-		door.Name = "Highlight_ESP"
 		door.Adornee = v.Parent:WaitForChild("Doorway"):WaitForChild("Door")
 		door.FillTransparency = 1
 		door.OutlineTransparency = 0.1
 		door.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
 	end
-	if toHighlight ~= nil and v:FindFirstChild("Highlight_ESP") then
+	if toHighlight ~= nil and v:FindFirstChild("Highlight") then
 		local a = Instance.new("Highlight",v)
-		a.Name = "Highlight_ESP"
 		a.Adornee = toHighlight
 		a.FillTransparency = 1
 		a.OutlineTransparency = 0.1
@@ -180,7 +206,7 @@ else
 print("This map has no objectives or objective ESP is disabled.")
 end
 
-UIS.InputBegan:Connect(function(input)
+--[[UIS.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld then
 		while settings.JumpCanBeHeld do
 			task.wait()
@@ -192,4 +218,4 @@ UIS.InputBegan:Connect(function(input)
 			end
 		end
 	end
-end)
+end)]]

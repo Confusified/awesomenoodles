@@ -1,5 +1,5 @@
 local settingsTable = {
-		Version = '0.1d',
+		Version = '0.2a',
 		JumpCanBeHeld = false,
 		AutoStrafe = false,
 		GameTimer = true,
@@ -207,7 +207,7 @@ end
 
 local function holdJump()
     task.wait()
-while UIS:IsKeyDown(Enum.KeyCode.Space) do
+while UIS:IsKeyDown(Enum.KeyCode.Space) and settings.JumpCanBeHeld do
 		task.wait()
 		local Character = game:GetService("Players").LocalPlayer.Character
 		if Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Landed then
@@ -219,7 +219,7 @@ while UIS:IsKeyDown(Enum.KeyCode.Space) do
 end
 
 UIS.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.Space then
+	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld then
 		local Character = game:GetService("Players").LocalPlayer.Character
 		if Character:FindFirstChild("Humanoid").FloorMaterial ~= Enum.Material.Air then
 			Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping) --jumps then auto jumps if held

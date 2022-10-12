@@ -204,16 +204,14 @@ else
 print("This map has no objectives. (Objective ESP is "..tostring(settings.ObjectiveESP)..")")
 end
 
---[[UIS.InputBegan:Connect(function(input)
+UIS.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld then
-		while settings.JumpCanBeHeld do
+		while UIS:IsKeyDown(Enum.KeyCode.Space) do
 			task.wait()
 			local Character = game:GetService("Players").LocalPlayer.Character
-			local Communicator = Character:FindFirstChild("Communicator")
 			if Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Landed then
 				Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
-				task.wait()
 			end
 		end
 	end
-end)]]
+end)

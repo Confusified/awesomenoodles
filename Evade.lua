@@ -1,5 +1,5 @@
 local settingsTable = {
-		Version = '0.2a',
+		Version = '0.2b',
 		JumpCanBeHeld = false,
 		AutoStrafe = false,
 		GameTimer = true,
@@ -213,7 +213,7 @@ while UIS:IsKeyDown(Enum.KeyCode.Space) and settings.JumpCanBeHeld do
 		if Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Landed then
 			task.wait()
 			Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
-		    print("") --fixes auto-jump for some reason
+		    	Character:FindFirstChild("Humanoid").FreeFalling:Wait()
 		end
 	end
 end

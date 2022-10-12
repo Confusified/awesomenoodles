@@ -32,7 +32,6 @@ end
 local settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
 
 if settings.Version == nil or settings.Version ~= settingsTable.Version then
-print("Using outdated version!")
 	for i,v in pairs(settingsTable) do
     	if settings[i] == nil then
             settings[i] = v
@@ -133,13 +132,13 @@ for _,child in ipairs(WS_Players:GetChildren()) do
 	    applyESP(child)
 end
 for _,child in ipairs(RagdollFolder:GetChildren()) do
-	local function checkForHighlight()
+	local function checkForHighlight(child)
 		if child:FindFirstChild("Highlight") then
 			child:FindFirstChild("Highlight"):Destroy()
 		end
 	end
 	
-	checkForHighlight()
+	checkForHighlight(child)
 	
 	RagdollFolder.ChildAdded:Connect(checkForHighlight)
 end
@@ -181,7 +180,6 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 	    toHighlight = v:WaitForChild("Switch")
 	elseif v.Name == "Transportation" then
 		toHighlight = v:WaitForChild("Part")
-	
 	elseif v.Name == "Generator" then
 		toHighlight = v:WaitForChild("Diesel generator")
 	elseif v.Name == "Key" then
@@ -193,17 +191,18 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 		door.OutlineTransparency = 0.1
 		door.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
 	end
-	if toHighlight ~= nil and v:FindFirstChild("Highlight") then
+	if toHighlight ~= nil and not v:FindFirstChild("Highlight") then
 		local a = Instance.new("Highlight",v)
 		a.Adornee = toHighlight
 		a.FillTransparency = 1
 		a.OutlineTransparency = 0.1
 		a.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
 	end
+	print(toHighlight)
 end
 end
 else
-print("This map has no objectives or objective ESP is disabled.")
+print("This map has no objectives. (Objective ESP is "..tostring(settings.ObjectiveESP)..")")
 end
 
 --[[UIS.InputBegan:Connect(function(input)

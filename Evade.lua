@@ -174,8 +174,8 @@ end
 
 local ObjectivesFolder = MapFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
 if ObjectivesFolder and #ObjectivesFolder:GetChildren() > 0 and settings.ObjectiveESP then
+    local toHighlight = nil
 for i,v in ipairs(ObjectivesFolder:GetChildren()) do
-	local toHighlight = nil
 	if v.Name == "Switch" then
 	    toHighlight = v:WaitForChild("Switch")
 	elseif v.Name == "Transportation" then
@@ -190,7 +190,8 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 		door.FillTransparency = 1
 		door.OutlineTransparency = 0.1
 		door.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
-	end
+		end
+    end
 	if toHighlight ~= nil and not v:FindFirstChild("Highlight") then
 		local a = Instance.new("Highlight",v)
 		a.Adornee = toHighlight
@@ -198,8 +199,6 @@ for i,v in ipairs(ObjectivesFolder:GetChildren()) do
 		a.OutlineTransparency = 0.1
 		a.OutlineColor = Color3.fromHex(settings.ObjectiveESPColor)
 	end
-	print(toHighlight)
-end
 end
 else
 print("This map has no objectives. (Objective ESP is "..tostring(settings.ObjectiveESP)..")")

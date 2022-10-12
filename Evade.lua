@@ -46,6 +46,7 @@ if settings.Version == nil or settings.Version ~= settingsTable.Version then
 end
 
 local UIS = game:GetService("UserInputService")
+local CAS = game:GetService("ContextActionService")
 local GameFolder = game:GetService("Workspace"):WaitForChild("Game")
 local RagdollFolder = GameFolder:WaitForChild("Effects"):WaitForChild("Ragdolls")
 local MapFolder = GameFolder:WaitForChild("Map")
@@ -204,14 +205,31 @@ else
 print("This map has no objectives. (Objective ESP is "..tostring(settings.ObjectiveESP)..")")
 end
 
-UIS.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld then
-		while UIS:IsKeyDown(Enum.KeyCode.Space) do
+local function holdJump()
+    task.wait()
+while UIS:IsKeyDown(Enum.KeyCode.Space) do
+		task.wait()
+		local Character = game:GetService("Players").LocalPlayer.Character
+		if Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Landed then
 			task.wait()
-			local Character = game:GetService("Players").LocalPlayer.Character
-			if Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Landed then
-				Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
-			end
+			Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+		    print("") --fixes auto-jump for some reason
 		end
+	end
+end
+
+UIS.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.Space then
+		local Character = game:GetService("Players").LocalPlayer.Character
+		if Character:FindFirstChild("Humanoid").FloorMaterial ~= Enum.Material.Air then
+			Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping) --jumps then auto jumps if held
+		end
+		CAS:BindAction("HoldJump",holdJump,true,Enum.KeyCode.Space)
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.Space then
+		CAS:UnbindAction("HoldJump")
 	end
 end)

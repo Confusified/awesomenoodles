@@ -1,5 +1,5 @@
 local settingsTable = {
-		Version = '0.2b',
+		Version = '0.2a',
 		JumpCanBeHeld = false,
 		AutoStrafe = false,
 		GameTimer = true,
@@ -87,10 +87,10 @@ local function applyESP(child)
 							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.DownedESPColor)
 						elseif child:FindFirstChild("Highlight") and child.Name ~= game:GetService("Players").LocalPlayer.Name then
 							if game:GetService("Players"):FindFirstChild(child.Name):IsFriendsWith(game:GetService("Players").LocalPlayer.UserId) then
-							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.CustomFriendESPColor)
-						else
-							child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
-						end
+								child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.CustomFriendESPColor)
+							else
+								child:FindFirstChild("Highlight").OutlineColor = Color3.fromHex(settings.PlayerESPColor)
+							end
 						end
 						if child:GetAttribute("ReviveTimeLeft") and not child:FindFirstChild("BillboardGui") and settings.DownedTimer then
 								local bbg = Instance.new("BillboardGui",child)
@@ -126,16 +126,19 @@ local function applyESP(child)
 					end)
 				end
 		    end
-			
 		end
 
 for _,child in ipairs(WS_Players:GetChildren()) do
-	    applyESP(child)
+	if child:FindFirstChildWhichIsA("Highlight") and child:FindFirstChildWhichIsA("Highlight").Name ~= "Highlight" then
+		print(child:FindFirstChildWhichIsA("Highlight").Name)
+	end
+	applyESP(child)
 end
+
 for _,child in ipairs(RagdollFolder:GetChildren()) do
 	local function checkForHighlight(child)
-		if child:FindFirstChild("Highlight") then
-			child:FindFirstChild("Highlight"):Destroy()
+		if child:FindFirstChildWhichIsA("Highlight") then
+			child:FindFirstChildWhichIsA("Highlight"):Destroy()
 		end
 	end
 	
@@ -213,7 +216,7 @@ while UIS:IsKeyDown(Enum.KeyCode.Space) and settings.JumpCanBeHeld do
 		if Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Landed then
 			task.wait()
 			Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
-		    	Character:FindFirstChild("Humanoid").FreeFalling:Wait()
+		    Character:FindFirstChild("Humanoid").FreeFalling:Wait()
 		end
 	end
 end

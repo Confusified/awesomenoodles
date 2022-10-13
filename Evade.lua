@@ -1,5 +1,5 @@
 local settingsTable = {
-		Version = '0.2a',
+		Version = '0.3a',
 		JumpCanBeHeld = false,
 		AutoStrafe = false,
 		GameTimer = true,
@@ -45,6 +45,7 @@ if settings.Version == nil or settings.Version ~= settingsTable.Version then
 	print("Updated config file")
 end
 
+local RepStorage = game:GetService("ReplicatedStorage")
 local UIS = game:GetService("UserInputService")
 local CAS = game:GetService("ContextActionService")
 local GameFolder = game:GetService("Workspace"):WaitForChild("Game")
@@ -129,10 +130,24 @@ local function applyESP(child)
 		end
 
 for _,child in ipairs(WS_Players:GetChildren()) do
-	if child:FindFirstChildWhichIsA("Highlight") and child:FindFirstChildWhichIsA("Highlight").Name ~= "Highlight" then
-		print(child:FindFirstChildWhichIsA("Highlight").Name)
-	end
 	applyESP(child)
+end
+
+WS_Players.ChildAdded:Connect(function(child)
+    if not game:GetService("Players"):FindFirstChild(child.Name) then
+		repeat task.wait() until #child:GetChildren() > 4
+		applyESP(child)
+	end
+end)
+
+for i,v in ipairs(game:GetService("Players"):GetPlayers()) do
+		v.CharacterAdded:Connect(function()
+		local character = v.Character
+		repeat task.wait() until character:FindFirstChildWhichIsA("BodyColors") --last item to be added to character (shitty fix imo)
+		if settings.PlayerESP then
+			applyESP(character)
+		end
+	end)
 end
 
 for _,child in ipairs(RagdollFolder:GetChildren()) do
@@ -213,10 +228,13 @@ local function holdJump()
 while UIS:IsKeyDown(Enum.KeyCode.Space) and settings.JumpCanBeHeld do
 		task.wait()
 		local Character = game:GetService("Players").LocalPlayer.Character
-		if Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Landed then
+		local Hum = Character:WaitForChild("Humanoid",3)
+		if not Hum then return end
+		
+		if Hum:GetState() == Enum.HumanoidStateType.Landed then
 			task.wait()
-			Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
-		    Character:FindFirstChild("Humanoid").FreeFalling:Wait()
+			Hum:ChangeState(Enum.HumanoidStateType.Jumping)
+		    Hum.FreeFalling:Wait()
 		end
 	end
 end
@@ -224,8 +242,11 @@ end
 UIS.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld then
 		local Character = game:GetService("Players").LocalPlayer.Character
-		if Character:FindFirstChild("Humanoid").FloorMaterial ~= Enum.Material.Air then
-			Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping) --jumps then auto jumps if held
+		local Hum = Character:WaitForChild("Humanoid",3)
+		if not Hum then return end
+		
+		if Hum.FloorMaterial ~= Enum.Material.Air then
+			Hum:ChangeState(Enum.HumanoidStateType.Jumping) --jumps then auto jumps if held
 		end
 		CAS:BindAction("HoldJump",holdJump,true,Enum.KeyCode.Space)
 	end
@@ -236,3 +257,19 @@ UIS.InputEnded:Connect(function(input)
 		CAS:UnbindAction("HoldJump")
 	end
 end)
+
+
+game:GetService("Debris").ChildAdded:Connect(function(child)
+	if settings.PlayerESP then
+		if not child.Parent then
+			repeat task.wait() until child.Parent
+			child:Destroy()
+		end
+	end
+end)
+
+for i,v in ipairs(game:GetService("Debris"):GetChildren()) do
+	if v:IsA("Highlight") then
+		v:Destroy()
+	end
+end

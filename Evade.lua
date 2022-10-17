@@ -1,8 +1,9 @@
 local settingsTable = {
-		Version = '0.3a',
+		Version = '0.3e',
 		JumpCanBeHeld = false,
 		AutoStrafe = false,
 		GameTimer = true,
+		RevealImposter = true,
    		NextbotESP = true,
 		NextbotESPColor = '#FF0000',
 		PlayerESP = true,
@@ -16,6 +17,7 @@ local settingsTable = {
 		CustomFriendESP = true,
 		CustomFriendESPColor = '#00FF00'
     }
+	
 local fName = "ConConfigs"
 local FileName = "Evade.txt"
 local fullFileName = fName.."\\"..FileName
@@ -55,7 +57,9 @@ local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
 local function applyESP(child)
 		for i,v in ipairs(child:GetChildren()) do
-			if not child:FindFirstChild("Highlight") then
+			if child.Name == "BeaconHighlight" then child:Destroy() end
+			task.wait()
+			if not child:FindFirstChildWhichIsA("Highlight") then
 				if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
 					local a = Instance.new("Highlight",v.Parent)
 					a.FillTransparency = 1
@@ -131,24 +135,45 @@ local function applyESP(child)
 
 for _,child in ipairs(WS_Players:GetChildren()) do
 	applyESP(child)
+	if GameStats:GetAttribute("SpecialRound") == "Imposter" and GameStats:GetAttribute("RoundStarted") == true and settings.RevealImposter and child:FindFirstChild("Weapon") then
+		print(child.Name.." is Imposter.")
+	end
+	child.ChildAdded:Connect(function(item)
+		if item.Name == "BeaconHighlight" and item:IsA("Highlight") and item.Enabled == true then
+			item.Enabled = false
+		end
+	end)
 end
 
 WS_Players.ChildAdded:Connect(function(child)
     if not game:GetService("Players"):FindFirstChild(child.Name) then
 		repeat task.wait() until #child:GetChildren() > 4
 		applyESP(child)
-	end
+		end
 end)
 
 for i,v in ipairs(game:GetService("Players"):GetPlayers()) do
-		v.CharacterAdded:Connect(function()
-		local character = v.Character
+	if settings.PlayerESP and v == game:GetService("Players").LocalPlayer then
+		v:WaitForChild("PlayerScripts"):WaitForChild("FX"):WaitForChild("Highlight").Enabled = false
+	end
+	
+	v.CharacterAdded:Connect(function(character)
 		repeat task.wait() until character:FindFirstChildWhichIsA("BodyColors") --last item to be added to character (shitty fix imo)
 		if settings.PlayerESP then
 			applyESP(character)
 		end
 	end)
 end
+
+game:GetService("Players").PlayerAdded:Connect(function(plr)
+	plr.CharacterAdded:Connect(function(character)
+		repeat task.wait() until character:FindFirstChildWhichIsA("BodyColors") --last item to be added to character (shitty fix imo)
+		if settings.PlayerESP then
+			applyESP(character)
+		end
+	end)
+end)
+
 
 for _,child in ipairs(RagdollFolder:GetChildren()) do
 	local function checkForHighlight(child)
@@ -183,12 +208,13 @@ if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 				local maxval = math.max(0, GameStats:GetAttribute("TimeRemaining"));
 				TimeLeft.Text = string.sub(string.format("%02d:%02d", math.floor(maxval / 60), math.floor(maxval) % 60), 2);
 		end
-	
+		
+		
 		updateTimer()
-	
+		
 		workspace.Game.Stats:GetAttributeChangedSignal("TimeRemaining"):Connect(function()
 				updateTimer()
-		end);
+		end)
 end
 
 local ObjectivesFolder = MapFolder:WaitForChild("Parts"):FindFirstChild("Objectives")
@@ -240,7 +266,7 @@ while UIS:IsKeyDown(Enum.KeyCode.Space) and settings.JumpCanBeHeld do
 end
 
 UIS.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld then
+	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld and GameStats:GetAttribute("SpecialRound") ~= "NoJumping" then
 		local Character = game:GetService("Players").LocalPlayer.Character
 		local Hum = Character:WaitForChild("Humanoid",3)
 		if not Hum then return end
@@ -257,19 +283,3 @@ UIS.InputEnded:Connect(function(input)
 		CAS:UnbindAction("HoldJump")
 	end
 end)
-
-
-game:GetService("Debris").ChildAdded:Connect(function(child)
-	if settings.PlayerESP then
-		if not child.Parent then
-			repeat task.wait() until child.Parent
-			child:Destroy()
-		end
-	end
-end)
-
-for i,v in ipairs(game:GetService("Debris"):GetChildren()) do
-	if v:IsA("Highlight") then
-		v:Destroy()
-	end
-end

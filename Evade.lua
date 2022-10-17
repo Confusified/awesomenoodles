@@ -1,5 +1,5 @@
 local settingsTable = {
-		Version = '0.3e',
+		Version = '0.3e.a',
 		JumpCanBeHeld = false,
 		AutoStrafe = false,
 		GameTimer = true,
@@ -57,7 +57,6 @@ local WS_Players = GameFolder:WaitForChild("Players")
 local GameStats = GameFolder:WaitForChild("Stats")
 local function applyESP(child)
 		for i,v in ipairs(child:GetChildren()) do
-			if child.Name == "BeaconHighlight" then child:Destroy() end
 			task.wait()
 			if not child:FindFirstChildWhichIsA("Highlight") then
 				if v:IsA("MeshPart") and v.Name == "HumanoidRootPart" then
@@ -140,8 +139,9 @@ for _,child in ipairs(WS_Players:GetChildren()) do
 	end
 	child.ChildAdded:Connect(function(item)
 		if item.Name == "BeaconHighlight" and item:IsA("Highlight") and item.Enabled == true then
-			item.Enabled = false
+			item:Destroy()
 		end
+		applyESP(child)
 	end)
 end
 
@@ -209,7 +209,6 @@ if not game:GetService("CoreGui"):FindFirstChild("EvadeGui") then
 				TimeLeft.Text = string.sub(string.format("%02d:%02d", math.floor(maxval / 60), math.floor(maxval) % 60), 2);
 		end
 		
-		
 		updateTimer()
 		
 		workspace.Game.Stats:GetAttributeChangedSignal("TimeRemaining"):Connect(function()
@@ -266,12 +265,14 @@ while UIS:IsKeyDown(Enum.KeyCode.Space) and settings.JumpCanBeHeld do
 end
 
 UIS.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld and GameStats:GetAttribute("SpecialRound") ~= "NoJumping" then
+	if input.KeyCode == Enum.KeyCode.Space and settings.JumpCanBeHeld then
+		if GameStats:GetAttribute("SpecialRound") and GameStats:GetAttribute("SpecialRound") == "NoJumping" then return end
 		local Character = game:GetService("Players").LocalPlayer.Character
 		local Hum = Character:WaitForChild("Humanoid",3)
 		if not Hum then return end
 		
 		if Hum.FloorMaterial ~= Enum.Material.Air then
+			if GameStats:GetAttribute("SpecialRound") and GameStats:GetAttribute("SpecialRound") == "NoJumping" then return end
 			Hum:ChangeState(Enum.HumanoidStateType.Jumping) --jumps then auto jumps if held
 		end
 		CAS:BindAction("HoldJump",holdJump,true,Enum.KeyCode.Space)

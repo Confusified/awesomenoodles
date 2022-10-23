@@ -39,66 +39,69 @@ local FarmingTab = Main:MakeTab({Name = "Farming", PremiumOnly = false,Icon = "r
 local Farming_ToggleSection = FarmingTab:AddSection({Name = "Toggles"})
 
 local FarmClasses = Farming_ToggleSection:AddToggle({Name = "Farm Selected Classes", Default = RH_Settings.AutoFarm, Callback = function(state)
-    print(state)
     RH_Settings.AutoFarm = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local AttendClasses = Farming_ToggleSection:AddToggle({Name = "Attend Selected Classes", Default = RH_Settings.AutoAttend, Callback = function(state)
-    print(state)
     RH_Settings.AutoAttend = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local Farming_ClassSection = FarmingTab:AddSection({Name = "Class Toggles"})
 
 local ClassEnglish = Farming_ClassSection:AddToggle({Name = "English Class", Default = RH_Settings.EnglishClass, Callback = function(state)
-    print(state)
     RH_Settings.EnglishClass = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local ClassChemistry = Farming_ClassSection:AddToggle({Name = "Chemistry Class", Default = RH_Settings.ChemistryClass, Callback = function(state)
-    print(state)
     RH_Settings.ChemistryClass = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local ClassSwimming = Farming_ClassSection:AddToggle({Name = "Swimming Class", Default = RH_Settings.SwimmingClass, Callback = function(state)
-    print(state)
     RH_Settings.SwimmingClass = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local ClassBaking = Farming_ClassSection:AddToggle({Name = "Baking Class", Default = RH_Settings.BakingClass, Callback = function(state)
-    print(state)
     RH_Settings.BakingClass = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local ClassComputer = Farming_ClassSection:AddToggle({Name = "Computer Class", Default = RH_Settings.ComputerClass, Callback = function(state)
-    print(state)
     RH_Settings.ComputerClass = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local ClassPE = Farming_ClassSection:AddToggle({Name = "PE Class", Default = RH_Settings.PEClass, Callback = function(state)
-    print(state)
     RH_Settings.PEClass = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local ClassMusic = Farming_ClassSection:AddToggle({Name = "Music Class", Default = RH_Settings.MusicClass, Callback = function(state)
-    print(state)
     RH_Settings.MusicClass = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
 local ClassArt = Farming_ClassSection:AddToggle({Name = "Art Class", Default = RH_Settings.ArtClass, Callback = function(state)
-    print(state)
     RH_Settings.ArtClass = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+
 end})
 
+local UnnamedTab = Main:MakeTab({Name = "TBA", PremiumOnly = false,Icon = ""})
 
+
+OrionLib:MakeNotification({Name = "Orion", Content = "Orion has successfully loaded!", Icon = "", Time = 5})
 OrionLib:Init() --end of script

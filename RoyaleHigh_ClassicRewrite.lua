@@ -23,7 +23,7 @@ local settingsTable = {
     Lunch = false,
     Breakfast = false,
     Dance = false,
-	LimboFarm = true,
+    LimboFarm = true,
     onJoinGetBooks = true
     }
 
@@ -43,14 +43,21 @@ end
 local RH_Settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 if not LocalPlayer.Character then LocalPlayer.CharacterAdded:Wait() end
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TriggerCaptcha = ReplicatedStorage:WaitForChild("CaptchaRemote"):WaitForChild("TriggerCaptcha")
+local SolvedCaptcha = ReplicatedStorage:WaitForChild("CaptchaRemote"):WaitForChild("SolvedRemoteEvent")
 local CurrentClass = ReplicatedStorage:WaitForChild("CurrentActivity")
 local RepLockerFolder = ReplicatedStorage:WaitForChild("Lockers")
 local ReplicatedClasses = ReplicatedStorage:WaitForChild("Classes")
 local ClassRemote = ReplicatedClasses:WaitForChild("Starting")
+local ArtRemote = ReplicatedStorage:WaitForChild("Tools"):WaitForChild("Paint"):WaitForChild("SetColor")
+local EnglishRemote = ReplicatedClasses:WaitForChild("English")
+local InstructionRemote = ReplicatedClasses:WaitForChild("Instructions")
+local ChemistryRemote = ReplicatedClasses:WaitForChild("Chemistry")
 local CodeRemote = RepLockerFolder:WaitForChild("Code")
 local AbandonRemote = RepLockerFolder:WaitForChild("Abandon")
 local ContentFunction = RepLockerFolder:WaitForChild("Contents")
@@ -129,14 +136,13 @@ end})
 
 local Farming_LesserClassSection = FarmingTab:AddSection({Name = "Others - THESE DO NOT GRANT XP"})
 
-
-local LunchToggle = Farming_LesserClassSection:AddToggle({Name = "Lunch", Default = RH_Settings.Lunch, Callback = function(state)
-    RH_Settings.Lunch = state
+local BreakfastToggle = Farming_LesserClassSection:AddToggle({Name = "Breakfast", Default = RH_Settings.Breakfast, Callback = function(state)
+    RH_Settings.Breakfast = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local BreakfastToggle = Farming_LesserClassSection:AddToggle({Name = "Breakfast", Default = RH_Settings.Breakfast, Callback = function(state)
-    RH_Settings.Breakfast = state
+local LunchToggle = Farming_LesserClassSection:AddToggle({Name = "Lunch", Default = RH_Settings.Lunch, Callback = function(state)
+    RH_Settings.Lunch = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
@@ -236,14 +242,48 @@ local DanceFarmToggle = MiscFarming_SectionDance:AddToggle({Name = "Auto Limbo",
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-
-
 ClassRemote.OnClientEvent:Connect(function()
 	if RH_Settings.AutoAttend then
 		if RH_Settings[CurrentClass.Value] then
 			ClassRemote:FireServer()
 			task.wait()
-			firesignal(LocalPlayer.PlayerGui.ClassNotifications.Teleport.Close.MouseButton1Click)
+			firesignal(PlayerGui:WaitForChild("ClassNotifications"):WaitForChild("Teleport"):WaitForChild("Close").MouseButton1Click)
+		end
+	end
+end)
+
+TriggerCaptcha.OnClientEvent:Connect(function(Bubble)
+	if RH_Settings.AntiBubble	then
+		for i=1,3 do
+			SolvedCaptcha:FireServer("FloatingBubble_" .. i, Bubble)
+		end
+		task.wait()
+		firesignal(PlayerGui:WaitForChild("CaptchaGui"):WaitForChild("Award"):WaitForChild("Close").MouseButton1Down)
+	end
+end)
+
+EnglishRemote.OnClientEvent:Connect(function(...)
+	if RH_Settings.English then
+	task.wait()
+		local args = {...}
+		for i,w in pairs(args) do
+			if type(w) == "table" and i == 2 then
+				for __,r in pairs(w) do
+					if type(r)=="table" then
+						for ___,word in pairs(r) do
+							local EnglishGui = PlayerGui:WaitForChild("EnglishClass"):WaitForChild("Frame")
+							for ____,uiWord in ipairs(EnglishGui:GetDescendants()) do
+								if uiWord:IsA("StringValue") and uiWord.Name == "Answer" then
+								print(word,uiWord.Value,uiWord.Parent.Text)
+									if string.match(uiWord.Value,word) then
+										EnglishRemote:FireServer(uiWord.Value)
+									end
+								end
+							end
+						end
+					end
+				end
+			end
 		end
 	end
 end)

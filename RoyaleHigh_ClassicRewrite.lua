@@ -1,3 +1,8 @@
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+if game.PlaceId ~= 1187101243 then return end
+
 local settingsTable = {
     HideCharacter = false,
     AutoAttend = true,
@@ -7,18 +12,17 @@ local settingsTable = {
     HopAfterSchool = false,
     AfterSchoolTable = {"Afternoon","Dance","Night"},
     LockerPin = "0000",
-    EnglishClass = false,
-    MusicClass = false,
-    ChemistryClass = false,
-    PEClass = false,
-    ComputerClass = false,
-    SwimmingClass = false,
-    BakingClass = false,
-    ArtClass = false,
-    LunchToggle = false,
-    BreakfastToggle = false,
-    DancePrepToggle = false,
-    DanceToggle = false,
+    English = false,
+    Music = false,
+    Chemistry = false,
+    PE = false,
+    Computer = false,
+    Swimming = false,
+    Baking = false,
+    Art = false,
+    Lunch = false,
+    Breakfast = false,
+    Dance = false,
     onJoinGetBooks = true
     }
 
@@ -38,14 +42,31 @@ end
 local RH_Settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
+
+if not LocalPlayer.Character then LocalPlayer.CharacterAdded:Wait() end
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CurrentClass = ReplicatedStorage:WaitForChild("CurrentActivity")
 local RepLockerFolder = ReplicatedStorage:WaitForChild("Lockers")
+local ReplicatedClasses = ReplicatedStorage:WaitForChild("Classes")
+local ClassRemote = ReplicatedClasses:WaitForChild("Starting")
 local CodeRemote = RepLockerFolder:WaitForChild("Code")
 local AbandonRemote = RepLockerFolder:WaitForChild("Abandon")
 local ContentFunction = RepLockerFolder:WaitForChild("Contents")
 local PlayerLocker = LocalPlayer:WaitForChild("Locker")
 
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+local HomeworkFolder = LocalPlayer:FindFirstChild("Homework")
+task.spawn(function()
+	if not HomeworkFolder then 
+		repeat task.wait() HomeworkFolder = LocalPlayer:FindFirstChild("Homework") until HomeworkFolder
+		if RH_Settings.AutoHomework then
+			OrionLib:MakeNotification({Name = "Homework", Content = "Fetched 'Homework' folder.", Icon = "", Time = 5})
+		end
+	end
+end)
+
 local Main = OrionLib:MakeWindow({Name = "Royale High - Classic", HidePremium = true, SaveConfig = false, ConfigFolder = "ConConfigs", IntroEnabled = false,Icon = "rbxassetid://4469750911"})
 
 local FarmingTab = Main:MakeTab({Name = "Class Farming", PremiumOnly = false,Icon = "rbxassetid://7059346373"})
@@ -65,66 +86,61 @@ end})
 
 local Farming_ClassSection = FarmingTab:AddSection({Name = "Class Toggles"})
 
-local ClassEnglish = Farming_ClassSection:AddToggle({Name = "English Class", Default = RH_Settings.EnglishClass, Callback = function(state)
-    RH_Settings.EnglishClass = state
+local ClassEnglish = Farming_ClassSection:AddToggle({Name = "English Class", Default = RH_Settings.English, Callback = function(state)
+    RH_Settings.English = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ClassChemistry = Farming_ClassSection:AddToggle({Name = "Chemistry Class", Default = RH_Settings.ChemistryClass, Callback = function(state)
-    RH_Settings.ChemistryClass = state
+local ClassChemistry = Farming_ClassSection:AddToggle({Name = "Chemistry Class", Default = RH_Settings.Chemistry, Callback = function(state)
+    RH_Settings.Chemistry = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ClassSwimming = Farming_ClassSection:AddToggle({Name = "Swimming Class", Default = RH_Settings.SwimmingClass, Callback = function(state)
-    RH_Settings.SwimmingClass = state
+local ClassSwimming = Farming_ClassSection:AddToggle({Name = "Swimming Class", Default = RH_Settings.Swimming, Callback = function(state)
+    RH_Settings.Swimming = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ClassBaking = Farming_ClassSection:AddToggle({Name = "Baking Class", Default = RH_Settings.BakingClass, Callback = function(state)
-    RH_Settings.BakingClass = state
+local ClassBaking = Farming_ClassSection:AddToggle({Name = "Baking Class", Default = RH_Settings.Baking, Callback = function(state)
+    RH_Settings.Baking = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ClassComputer = Farming_ClassSection:AddToggle({Name = "Computer Class", Default = RH_Settings.ComputerClass, Callback = function(state)
-    RH_Settings.ComputerClass = state
+local ClassComputer = Farming_ClassSection:AddToggle({Name = "Computer Class", Default = RH_Settings.Computer, Callback = function(state)
+    RH_Settings.Computer = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ClassPE = Farming_ClassSection:AddToggle({Name = "PE Class", Default = RH_Settings.PEClass, Callback = function(state)
-    RH_Settings.PEClass = state
+local ClassPE = Farming_ClassSection:AddToggle({Name = "PE Class", Default = RH_Settings.PE, Callback = function(state)
+    RH_Settings.PE = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ClassMusic = Farming_ClassSection:AddToggle({Name = "Music Class", Default = RH_Settings.MusicClass, Callback = function(state)
-    RH_Settings.MusicClass = state
+local ClassMusic = Farming_ClassSection:AddToggle({Name = "Music Class", Default = RH_Settings.Music, Callback = function(state)
+    RH_Settings.Music = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ClassArt = Farming_ClassSection:AddToggle({Name = "Art Class", Default = RH_Settings.ArtClass, Callback = function(state)
-    RH_Settings.ArtClass = state
+local ClassArt = Farming_ClassSection:AddToggle({Name = "Art Class", Default = RH_Settings.Art, Callback = function(state)
+    RH_Settings.Art = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
 local Farming_LesserClassSection = FarmingTab:AddSection({Name = "Others - THESE DO NOT GRANT XP"})
 
 
-local LunchToggle = Farming_LesserClassSection:AddToggle({Name = "Lunch", Default = RH_Settings.LunchToggle, Callback = function(state)
-    RH_Settings.LunchToggle = state
+local LunchToggle = Farming_LesserClassSection:AddToggle({Name = "Lunch", Default = RH_Settings.Lunch, Callback = function(state)
+    RH_Settings.Lunch = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
 local BreakfastToggle = Farming_LesserClassSection:AddToggle({Name = "Breakfast", Default = RH_Settings.BreakfastToggle, Callback = function(state)
-    RH_Settings.BreakfastToggle = state
+    RH_Settings.Breakfast = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local DancePrepToggle = Farming_LesserClassSection:AddToggle({Name = "Dance Preparations", Default = RH_Settings.DancePrepToggle, Callback = function(state)
-    RH_Settings.DancePrepToggle = state
-    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
-end})
-
-local DanceToggle = Farming_LesserClassSection:AddToggle({Name = "Dance", Default = RH_Settings.DanceToggle, Callback = function(state)
-    RH_Settings.DanceToggle = state
+local DanceToggle = Farming_LesserClassSection:AddToggle({Name = "Dance", Default = RH_Settings.Dance, Callback = function(state)
+    RH_Settings.Dance = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
@@ -132,43 +148,43 @@ local MiscFarmingTab = Main:MakeTab({Name = "Misc Farming", PremiumOnly = false,
 
 local MiscFarming_SectionBooks = MiscFarmingTab:AddSection({Name = "Books"})
 
-
 local function GrabBooks()
-    local Lockers = game:GetService("Workspace"):FindFirstChild("Lockers")
-    if not Lockers then Lockers = game:GetService("Workspace"):WaitForChild("Lockers") end
-
-    local LockerDoor = Lockers:FindFirstChild("LockerDoor")
-    if not LockerDoor then LockerDoor = Lockers:WaitForChild("LockerDoor") end
-
-    local ClickDetector = LockerDoor:FindFirstChildWhichIsA("ClickDetector")
-    if not ClickDetector then repeat task.wait() ClickDetector = LockerDoor:FindFirstChildWhichIsA("ClickDetector") until ClickDetector end
-
-    if #PlayerLocker:GetChildren() == 0 then return end
+    local LockerDoor = nil
+	local ClickDetector = nil
+	for _,TextLabel in ipairs(game:GetService("Workspace"):GetDescendants()) do
+		if TextLabel.ClassName == "TextLabel" and TextLabel.Text == "Claim" then
+			LockerDoor = TextLabel.Parent.Parent
+			ClickDetector = LockerDoor:FindFirstChildWhichIsA("ClickDetector")
+			break
+		end
+	end
 	
-	AbandonRemote:FireServer()
+	if #PlayerLocker:GetChildren() == 0 then return end
+	
+	fireclickdetector(ClickDetector,1)
 	task.wait()
-    fireclickdetector(ClickDetector,1)
-    task.wait()
-	
-    CodeRemote:FireServer(LockerDoor,RH_Settings.LockerPin,"Create")
-    task.wait()
-    CodeRemote:FireServer(LockerDoor,RH_Settings.LockerPin,"Enter")
+	CodeRemote:FireServer(LockerDoor,RH_Settings.LockerPin,"Create")
+	task.wait()
+	CodeRemote:FireServer(LockerDoor,RH_Settings.LockerPin,"Enter")
+	task.wait()
 
-    while #PlayerLocker:GetChildren() ~= 0 do task.wait()
-        for _,Book in ipairs(PlayerLocker:GetChildren()) do
-            if PlayerLocker:FindFirstChild(Book.Name) then
-                ContentFunction:InvokeServer("Take",PlayerLocker[Book.Name])
-            end
-            task.wait()
-        end
-    end
+	while #PlayerLocker:GetChildren() ~= 0 do task.wait()
+	local CurrentBooksInLocker = #PlayerLocker:GetChildren()
+		for _,Book in ipairs(PlayerLocker:GetChildren()) do
+			if PlayerLocker:FindFirstChild(Book.Name) then
+					CodeRemote:FireServer(LockerDoor,RH_Settings.LockerPin,"Enter")
+					task.wait()
+					ContentFunction:InvokeServer("Take",PlayerLocker[Book.Name])
+					task.wait()
+			end
+			task.wait()
+		end
+	end
 
-    task.wait()
-    fireclickdetector(ClickDetector,0)
-    AbandonRemote:FireServer()
+	task.wait()
+	fireclickdetector(ClickDetector,0)
+	AbandonRemote:FireServer()
 end
-
-if RH_Settings.onJoinGetBooks then GrabBooks() end
 
 local BooksButton = MiscFarming_SectionBooks:AddButton({Name = "Get Books",Callback = function() GrabBooks() end})
 
@@ -189,6 +205,43 @@ end})
 
 local MiscFarming_SectionHomework = MiscFarmingTab:AddSection({Name = "Homework"})
 
+local function DoHomework()
+	if not HomeworkFolder then OrionLib:MakeNotification({Name = "Homework", Content = "Missing 'Homework' folder.", Icon = "", Time = 5}) return end
+		while #HomeworkFolder:GetChildren() ~= 0 do task.wait()
+		for _,Homework in ipairs(HomeworkFolder:GetChildren()) do
+			if HomeworkFolder:FindFirstChild(Homework.Name) then
+				Homework:WaitForChild("Complete"):FireServer()
+				local HomeworkCollector = game:GetService("Workspace"):WaitForChild("Homeworkbox_"..Homework.Name):WaitForChild("Click"):WaitForChild("ClickDetector")
+				fireclickdetector(HomeworkCollector,1)
+				fireclickdetector(HomeworkCollector,0)
+				task.wait()
+			end
+			task.wait()
+		end
+	end
+end
 
-OrionLib:MakeNotification({Name = "Orion", Content = "Orion has successfully loaded!", Icon = "", Time = 5})
-OrionLib:Init() --end of script
+local HomeworkButton = MiscFarming_SectionHomework:AddButton({Name = "Do Homework",Callback = function() DoHomework() end})
+
+local HomeworkToggle = MiscFarming_SectionHomework:AddToggle({Name = "Auto Homework",Default = RH_Settings.AutoHomework,Callback = function(state)
+    RH_Settings.AutoHomework = state
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+end})
+
+ClassRemote.OnClientEvent:Connect(function()
+	if RH_Settings.AutoAttend then
+		if RH_Settings[CurrentClass.Value] then
+			ClassRemote:FireServer()
+			task.wait()
+			firesignal(LocalPlayer.PlayerGui.ClassNotifications.Teleport.Close.MouseButton1Down)
+		end
+	end
+end)
+
+task.spawn(function()
+	if RH_Settings.onJoinGetBooks then task.wait() GrabBooks() end
+	if RH_Settings.AutoHomework then task.wait() DoHomework() end
+end)
+
+OrionLib:MakeNotification({Name = "Orion", Content = "Orion has successfully loaded!", Icon = "", Time = 4})
+OrionLib:Init()

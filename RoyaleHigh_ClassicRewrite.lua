@@ -62,6 +62,7 @@ local CodeRemote = RepLockerFolder:WaitForChild("Code")
 local AbandonRemote = RepLockerFolder:WaitForChild("Abandon")
 local ContentFunction = RepLockerFolder:WaitForChild("Contents")
 local PlayerLocker = LocalPlayer:WaitForChild("Locker")
+local wordList = {"Amateur","Wednesday","Until","a lot","Dessert","Embarrassing","Enough","Argument","February","Library","Tongue","Camouflage","Accommodate","Beautiful"}
 
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
@@ -270,13 +271,11 @@ EnglishRemote.OnClientEvent:Connect(function(...)
 			if type(w) == "table" and i == 2 then
 				for __,r in pairs(w) do
 					if type(r)=="table" then
-						for ___,word in pairs(r) do
-							local EnglishGui = PlayerGui:WaitForChild("EnglishClass"):WaitForChild("Frame")
-							for ____,uiWord in ipairs(EnglishGui:GetDescendants()) do
-								if uiWord:IsA("StringValue") and uiWord.Name == "Answer" then
-									if uiWord.Value == word then
-										task.wait()
-										EnglishRemote:FireServer(uiWord.Value)
+						if type(r)=="table" then
+							for t,y in pairs(r) do
+								for z,x in pairs(wordList) do
+									if y == x then
+										EnglishRemote:FireServer(tostring(x))
 									end
 								end
 							end
@@ -289,8 +288,12 @@ EnglishRemote.OnClientEvent:Connect(function(...)
 end)
 
 local function WinPE()
-	local ClassModel = game:GetService("Workspace"):FindFirstChild("PE") or game:GetService("Workspace"):WaitForChild("PE")
-	local PEBell = ClassModel:FindFirstChild("Bell") or ClassModel:WaitForChild("Bell")
+	local ClassModel = game:GetService("Workspace"):FindFirstChild("PE")
+	if not ClassModel then repeat task.wait() ClassModel = game:GetService("Workspace"):FindFirstChild("PE") until ClassModel end
+	
+	local PEBell = ClassModel:FindFirstChild("Bell")
+	if not PEBell then repeat task.wait() PEBell = game:GetService("Workspace"):FindFirstChild("Bell") until PEBell end
+	
 	while PEBell do task.wait()
 		if PEBell then
 			fireclickdetector(PEBell:WaitForChild("ClickDetector"),1)
@@ -300,13 +303,19 @@ local function WinPE()
 end
 
 local function RemoveSwimmingMinigame()
-	local ClassModel = game:GetService("Workspace"):FindFirstChild("SpinnerClass") or game:GetService("Workspace"):WaitForChild("SpinnerClass")
-		local Sensor = ClassModel:FindFirstChild("Sensor") or ClassModel:WaitForChild("Sensor")
-		local Spinner = ClassModel:FindFirstChild("Spinner") or ClassModel:WaitForChild("Spinner")
-		Sensor:Destroy()
-		for _,v in ipairs(Spinner:GetChildren()) do
-			v:Destroy()
-		end
+	local ClassModel = game:GetService("Workspace"):FindFirstChild("SpinnerClass")
+	if not ClassModel then repeat task.wait() ClassModel = game:GetService("Workspace"):FindFirstChild("SpinnerClass") until ClassModel end
+	
+	local Sensor = ClassModel:FindFirstChild("Sensor")
+	if not Sensor then repeat task.wait() Sensor = game:GetService("Workspace"):FindFirstChild("Sensor") until Sensor end
+	
+	local Spinner = ClassModel:FindFirstChild("Spinner")
+	if not Spinner then repeat task.wait() Spinner = game:GetService("Workspace"):FindFirstChild("Spinner") until Spinner end
+	
+	Sensor:Destroy()
+	for _,v in ipairs(Spinner:GetChildren()) do
+		v:Destroy()
+	end
 end
 
 CurrentClass.Changed:Connect(function()

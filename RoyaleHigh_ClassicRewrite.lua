@@ -23,6 +23,7 @@ local settingsTable = {
     Lunch = false,
     Breakfast = false,
     Dance = false,
+	LimboFarm = true,
     onJoinGetBooks = true
     }
 
@@ -134,7 +135,7 @@ local LunchToggle = Farming_LesserClassSection:AddToggle({Name = "Lunch", Defaul
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local BreakfastToggle = Farming_LesserClassSection:AddToggle({Name = "Breakfast", Default = RH_Settings.BreakfastToggle, Callback = function(state)
+local BreakfastToggle = Farming_LesserClassSection:AddToggle({Name = "Breakfast", Default = RH_Settings.Breakfast, Callback = function(state)
     RH_Settings.Breakfast = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
@@ -228,13 +229,53 @@ local HomeworkToggle = MiscFarming_SectionHomework:AddToggle({Name = "Auto Homew
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
+local MiscFarming_SectionDance = MiscFarmingTab:AddSection({Name = "Dance"})
+
+local DanceFarmToggle = MiscFarming_SectionDance:AddToggle({Name = "Auto Limbo",Default = RH_Settings.LimboFarm,Callback = function(state)
+    RH_Settings.LimboFarm = state
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+end})
+
+
+
 ClassRemote.OnClientEvent:Connect(function()
 	if RH_Settings.AutoAttend then
 		if RH_Settings[CurrentClass.Value] then
 			ClassRemote:FireServer()
 			task.wait()
-			firesignal(LocalPlayer.PlayerGui.ClassNotifications.Teleport.Close.MouseButton1Down)
+			firesignal(LocalPlayer.PlayerGui.ClassNotifications.Teleport.Close.MouseButton1Click)
 		end
+	end
+end)
+
+local function WinPE()
+	local ClassModel = game:GetService("Workspace"):FindFirstChild("PE") or game:GetService("Workspace"):WaitForChild("PE")
+	local PEBell = ClassModel:FindFirstChild("Bell") or ClassModel:WaitForChild("Bell")
+	while PEBell do task.wait()
+		if PEBell then
+			fireclickdetector(PEBell:WaitForChildWhichIsA("ClickDetector"),1)
+			fireclickdetector(PEBell:WaitForChildWhichIsA("ClickDetector"),0)
+		end
+	end
+end
+
+local function RemoveSwimmingMinigame()
+	local ClassModel = game:GetService("Workspace"):FindFirstChild("SpinnerClass") or game:GetService("Workspace"):WaitForChild("SpinnerClass")
+		local Sensor = ClassModel:FindFirstChild("Sensor") or ClassModel:WaitForChild("Sensor")
+		local Spinner = ClassModel:FindFirstChild("Spinner") or ClassModel:WaitForChild("Spinner")
+		Sensor:Destroy()
+		for _,v in ipairs(Spinner:GetChildren()) do
+			v:Destroy()
+		end
+end
+
+CurrentClass.Changed:Connect(function()
+	if CurrentClass.Value == "Swimming" and RH_Settings.Swimming then
+		RemoveSwimmingMinigame()
+	elseif CurrentClass.Value == "PE" and RH_Settings.PE then
+		WinPE()
+	elseif CurrentClass.Value == "Baking" and RH_Settings.Baking then
+		print("Nothing for Baking Class yet.")
 	end
 end)
 

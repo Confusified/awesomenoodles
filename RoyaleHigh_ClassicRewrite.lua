@@ -274,8 +274,8 @@ EnglishRemote.OnClientEvent:Connect(function(...)
 							local EnglishGui = PlayerGui:WaitForChild("EnglishClass"):WaitForChild("Frame")
 							for ____,uiWord in ipairs(EnglishGui:GetDescendants()) do
 								if uiWord:IsA("StringValue") and uiWord.Name == "Answer" then
-								print(word,uiWord.Value,uiWord.Parent.Text)
-									if string.match(uiWord.Value,word) then
+									if uiWord.Value == word then
+										task.wait()
 										EnglishRemote:FireServer(uiWord.Value)
 									end
 								end
@@ -293,8 +293,8 @@ local function WinPE()
 	local PEBell = ClassModel:FindFirstChild("Bell") or ClassModel:WaitForChild("Bell")
 	while PEBell do task.wait()
 		if PEBell then
-			fireclickdetector(PEBell:WaitForChildWhichIsA("ClickDetector"),1)
-			fireclickdetector(PEBell:WaitForChildWhichIsA("ClickDetector"),0)
+			fireclickdetector(PEBell:WaitForChild("ClickDetector"),1)
+			fireclickdetector(PEBell:WaitForChild("ClickDetector"),0)
 		end
 	end
 end
@@ -324,5 +324,5 @@ task.spawn(function()
 	if RH_Settings.AutoHomework then task.wait() DoHomework() end
 end)
 
-OrionLib:MakeNotification({Name = "Orion", Content = "Orion has successfully loaded!", Icon = "", Time = 4})
+OrionLib:MakeNotification({Name = "Orion", Content = "'Royale High - Classic' has successfully loaded!", Icon = "", Time = 4})
 OrionLib:Init()

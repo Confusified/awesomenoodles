@@ -362,15 +362,16 @@ local HideCharacterToggle = Misc_SectionPlayer:AddToggle({Name = "Hide Character
 			local hrp = Char:FindFirstChild("HumanoidRootPart")
 			local hum = Char:FindFirstChild("Humanoid")
 			local TargetPart = game:GetService("Workspace"):FindFirstChild("FurnitureShopCam")
-			if not Char or not hrp or not hum or not TargetPart or PauseHiding then return end
-			
-			if hum.Sit == true then hum.Sit = false end
-			
-			hrp.CFrame = CFrame.new(TargetPart.Position + Vector3.new(0,3.5,0)) * CFrame.Angles(0,math.rad(45),0)
-			hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
-			hrp.AssemblyAngularVelocity = Vector3.new(0,0,0)
-			task.wait()
+			if Char and hrp and hum and TargetPart and not PauseHiding then
+				if hum.Sit == true then hum.Sit = false end
+				
+				hrp.CFrame = CFrame.new(TargetPart.Position + Vector3.new(0,3.5,0)) * CFrame.Angles(0,math.rad(45),0)
+				hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+				hrp.AssemblyAngularVelocity = Vector3.new(0,0,0)
+				task.wait()
+			end
 		end
+		
 		if RH_Settings.HideCharacter == state == false then
 			local Char = LocalPlayer.Character
 			local hrp = Char:FindFirstChild("HumanoidRootPart")

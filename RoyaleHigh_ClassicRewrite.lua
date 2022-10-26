@@ -15,17 +15,17 @@ local settingsTable = {
     English = false,
     Music = false,
     Chemistry = false,
-	ChemistryMinWait = 4,
-	ChemistryMaxWait = 7.5,
+    ChemistryMinWait = 4,
+    ChemistryMaxWait = 7.5,
     PE = false,
     Computer = false,
-	ComputerMinWait = 6.5,
-	ComputerMaxWait = 8,
+    ComputerMinWait = 6.5,
+    ComputerMaxWait = 8,
     Swimming = false,
     Baking = false,
     Art = false,
-	ArtMinWait = 0.6,
-	ArtMaxWait = 0.85,
+    ArtMinWait = 0.6,
+    ArtMaxWait = 0.85,
     Lunch = false,
     Breakfast = false,
     Dance = false,
@@ -81,13 +81,37 @@ local wordList = {"Amateur","Wednesday","Until","a lot","Dessert","Embarrassing"
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
 local HomeworkFolder = LocalPlayer:FindFirstChild("Homework")
-task.spawn(function()
-	if not HomeworkFolder then 
-		repeat task.wait() HomeworkFolder = LocalPlayer:FindFirstChild("Homework") until HomeworkFolder
-		if RH_Settings.AutoHomework then
-			OrionLib:MakeNotification({Name = "Homework", Content = "Fetched 'Homework' folder.", Icon = "", Time = 5})
+
+local function DoHomework()
+	if not HomeworkFolder then OrionLib:MakeNotification({Name = "Homework", Content = "Missing 'Homework' folder.", Icon = "", Time = 5}) return end
+		while #HomeworkFolder:GetChildren() ~= 0 do task.wait()
+		for _,Homework in ipairs(HomeworkFolder:GetChildren()) do
+			if HomeworkFolder:FindFirstChild(Homework.Name) then
+				Homework:WaitForChild("Complete"):FireServer()
+				local HomeworkCollector = game:GetService("Workspace"):WaitForChild("Homeworkbox_"..Homework.Name):WaitForChild("Click"):WaitForChild("ClickDetector")
+				fireclickdetector(HomeworkCollector,1)
+				fireclickdetector(HomeworkCollector,0)
+				task.wait()
+			end
+			task.wait()
 		end
 	end
+end
+
+task.spawn(function()
+	repeat task.wait() HomeworkFolder = LocalPlayer:FindFirstChild("Homework") until HomeworkFolder
+	if RH_Settings.AutoHomework then
+		OrionLib:MakeNotification({Name = "Homework", Content = "Fetched 'Homework' folder.", Icon = "", Time = 5})
+		DoHomework()
+	end
+	
+	HomeworkFolder.ChildAdded:Connect(function(child)
+		if not RH_Settings.AutoHomework then return end
+		child:WaitForChild("Complete"):FireServer()
+		local HomeworkCollector = game:GetService("Workspace"):WaitForChild("Homeworkbox_"..child.Name):WaitForChild("Click"):WaitForChild("ClickDetector")
+		fireclickdetector(HomeworkCollector,1)
+		fireclickdetector(HomeworkCollector,0)
+	end)	
 end)
 
 local Main = OrionLib:MakeWindow({Name = "Royale High - Classic", HidePremium = true, SaveConfig = false, ConfigFolder = "ConConfigs", IntroEnabled = false,Icon = "rbxassetid://4469750911"})
@@ -286,22 +310,6 @@ local LockerInput = MiscFarming_SectionBooks:AddTextbox({Name = "Locker Code (ma
 end})
 
 local MiscFarming_SectionHomework = MiscFarmingTab:AddSection({Name = "Homework"})
-
-local function DoHomework()
-	if not HomeworkFolder then OrionLib:MakeNotification({Name = "Homework", Content = "Missing 'Homework' folder.", Icon = "", Time = 5}) return end
-		while #HomeworkFolder:GetChildren() ~= 0 do task.wait()
-		for _,Homework in ipairs(HomeworkFolder:GetChildren()) do
-			if HomeworkFolder:FindFirstChild(Homework.Name) then
-				Homework:WaitForChild("Complete"):FireServer()
-				local HomeworkCollector = game:GetService("Workspace"):WaitForChild("Homeworkbox_"..Homework.Name):WaitForChild("Click"):WaitForChild("ClickDetector")
-				fireclickdetector(HomeworkCollector,1)
-				fireclickdetector(HomeworkCollector,0)
-				task.wait()
-			end
-			task.wait()
-		end
-	end
-end
 
 local HomeworkButton = MiscFarming_SectionHomework:AddButton({Name = "Do Homework",Callback = function() DoHomework() end})
 

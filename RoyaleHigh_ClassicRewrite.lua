@@ -1,7 +1,17 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
-if game.PlaceId ~= 1187101243 then return end
+if game.GameId == 321778215 and game.PlaceId ~= 1187101243 then
+	OrionLib:MakeNotification({Name = "Royale High - Classic", Content = "You must be in 'Campus 1' to use this script.", Icon = "", Time = 8})
+	return
+end
+
+--local variables (not saved)
+local UseCustomWS = false
+local SliderWalkspeed = 16
+local PauseHiding = false
 
 local settingsTable = {
     HideCharacter = false,
@@ -12,18 +22,18 @@ local settingsTable = {
     HopAfterSchool = false,
     AfterSchoolTable = {"Afternoon","Dance","Night"},
     LockerPin = "0000",
-    English = false,
-    Music = false,
-    Chemistry = false,
+    English = true,
+    Music = true,
+    Chemistry = true,
     ChemistryMinWait = 4,
     ChemistryMaxWait = 7.5,
-    PE = false,
-    Computer = false,
+    PE = true,
+    Computer = true,
     ComputerMinWait = 6.5,
     ComputerMaxWait = 8,
-    Swimming = false,
-    Baking = false,
-    Art = false,
+    Swimming = true,
+    Baking = true,
+    Art = true,
     ArtMinWait = 0.6,
     ArtMaxWait = 0.85,
     Lunch = false,
@@ -78,8 +88,6 @@ local PlayerLocker = LocalPlayer:WaitForChild("Locker")
 local ChatBar = PlayerGui:WaitForChild("Chat"):WaitForChild("Frame"):WaitForChild("ChatBarParentFrame"):WaitForChild("Frame"):WaitForChild("BoxFrame"):WaitForChild("Frame"):WaitForChild("ChatBar")
 local wordList = {"Amateur","Wednesday","Until","a lot","Dessert","Embarrassing","Enough","Argument","February","Library","Tongue","Camouflage","Accommodate","Beautiful"}
 
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-
 local HomeworkFolder = LocalPlayer:FindFirstChild("Homework")
 
 local function DoHomework()
@@ -89,8 +97,7 @@ local function DoHomework()
 			if HomeworkFolder:FindFirstChild(Homework.Name) then
 				Homework:WaitForChild("Complete"):FireServer()
 				local HomeworkCollector = game:GetService("Workspace"):WaitForChild("Homeworkbox_"..Homework.Name):WaitForChild("Click"):WaitForChild("ClickDetector")
-				fireclickdetector(HomeworkCollector,1)
-				fireclickdetector(HomeworkCollector,0)
+				fireclickdetector(HomeworkCollector)
 				task.wait()
 			end
 			task.wait()
@@ -109,14 +116,13 @@ task.spawn(function()
 		if not RH_Settings.AutoHomework then return end
 		child:WaitForChild("Complete"):FireServer()
 		local HomeworkCollector = game:GetService("Workspace"):WaitForChild("Homeworkbox_"..child.Name):WaitForChild("Click"):WaitForChild("ClickDetector")
-		fireclickdetector(HomeworkCollector,1)
-		fireclickdetector(HomeworkCollector,0)
+		fireclickdetector(HomeworkCollector)
 	end)	
 end)
 
-local Main = OrionLib:MakeWindow({Name = "Royale High - Classic", HidePremium = true, SaveConfig = false, ConfigFolder = "ConConfigs", IntroEnabled = false,Icon = "rbxassetid://4469750911"})
+local Main = OrionLib:MakeWindow({Name = "Royale High - Classic", HidePremium = true, SaveConfig = false, ConfigFolder = fName, IntroEnabled = false,Icon = "rbxassetid://4469750911"})
 
-local FarmingTab = Main:MakeTab({Name = "Class Farming", PremiumOnly = false,Icon = "rbxassetid://7059346373"})
+local FarmingTab = Main:MakeTab({Name = "Class Farming", PremiumOnly = false,Icon = ""})
 local Farming_ToggleSection = FarmingTab:AddSection({Name = "Toggles"})
 
 local FarmClasses = Farming_ToggleSection:AddToggle({Name = "Farm Selected Classes", Default = RH_Settings.AutoFarm, Callback = function(state)
@@ -143,7 +149,7 @@ local ClassChemistry = Farming_ClassSection:AddToggle({Name = "Chemistry Class",
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ChemistryWaitMin = Farming_ClassSection:AddTextbox({Name = "Minimum wait to complete", Default = RH_Settings.ChemistryMinWait,TextDisappear = false,Callback = function(value)
+local ChemistryWaitMin = Farming_ClassSection:AddTextbox({Name = "Minimum wait per sequence", Default = RH_Settings.ChemistryMinWait,TextDisappear = false,Callback = function(value)
 	if type(tonumber(value)) ~= "number" or tonumber(value) < 0 or tonumber(value) > RH_Settings.ChemistryMaxWait then
         OrionLib:MakeNotification({Name = "Art", Content = "The inputted wait time is invalid.", Icon = "", Time = 5})
         return
@@ -153,7 +159,7 @@ local ChemistryWaitMin = Farming_ClassSection:AddTextbox({Name = "Minimum wait t
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local ChemistryWaitMax = Farming_ClassSection:AddTextbox({Name = "Maximum wait to complete", Default = RH_Settings.ChemistryMaxWait,TextDisappear = false,Callback = function(value)
+local ChemistryWaitMax = Farming_ClassSection:AddTextbox({Name = "Maximum wait per sequence", Default = RH_Settings.ChemistryMaxWait,TextDisappear = false,Callback = function(value)
 	if type(tonumber(value)) ~= "number" or tonumber(value) < 0 then
         OrionLib:MakeNotification({Name = "Art", Content = "The inputted wait time is invalid.", Icon = "", Time = 5})
         return
@@ -250,7 +256,7 @@ local DanceToggle = Farming_LesserClassSection:AddToggle({Name = "Dance", Defaul
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
-local MiscFarmingTab = Main:MakeTab({Name = "Misc Farming", PremiumOnly = false,Icon = "rbxassetid://7059346373"})
+local MiscFarmingTab = Main:MakeTab({Name = "Misc Farming", PremiumOnly = false,Icon = ""})
 
 local MiscFarming_SectionBooks = MiscFarmingTab:AddSection({Name = "Books"})
 
@@ -267,12 +273,9 @@ local function GrabBooks()
 	
 	if #PlayerLocker:GetChildren() == 0 then return end
 	
-	fireclickdetector(ClickDetector,1)
+	fireclickdetector(ClickDetector)
 	task.wait()
 	CodeRemote:FireServer(LockerDoor,RH_Settings.LockerPin,"Create")
-	task.wait()
-	CodeRemote:FireServer(LockerDoor,RH_Settings.LockerPin,"Enter")
-	task.wait()
 
 	while #PlayerLocker:GetChildren() ~= 0 do task.wait()
 	local CurrentBooksInLocker = #PlayerLocker:GetChildren()
@@ -288,7 +291,6 @@ local function GrabBooks()
 	end
 
 	task.wait()
-	fireclickdetector(ClickDetector,0)
 	AbandonRemote:FireServer()
 end
 
@@ -323,7 +325,83 @@ local MiscFarming_SectionDance = MiscFarmingTab:AddSection({Name = "Dance"})
 local DanceFarmToggle = MiscFarming_SectionDance:AddToggle({Name = "Auto Limbo",Default = RH_Settings.LimboFarm,Callback = function(state)
     RH_Settings.LimboFarm = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+	task.spawn(function()
+		while RH_Settings.LimboFarm do task.wait()
+			local Character = LocalPlayer.Character
+			local LimboPart = nil
+			local DanceModel = game:GetService("Workspace"):FindFirstChild("SchoolDance")
+			if not DanceModel then return end
+			
+			if not LimboPart then
+				for _,instance in ipairs(DanceModel:GetDescendants()) do
+					if instance:IsA("Script") and instance.Name == "LimboScript" then
+						LimboPart = instance.Parent
+					end
+				end
+			end
+			
+			if LimboPart then
+				firetouchinterest(Character.PrimaryPart,LimboPart,true)
+				firetouchinterest(Character.PrimaryPart,LimboPart,false)
+			end
+		end
+	end)
 end})
+
+local MiscTab = Main:MakeTab({Name = "Misc", PremiumOnly = false,Icon = ""})
+
+local Misc_SectionPlayer = MiscTab:AddSection({Name = "Player"})
+
+local HideCharacterToggle = Misc_SectionPlayer:AddToggle({Name = "Hide Character",Default = RH_Settings.HideCharacter,Callback = function(state)
+	RH_Settings.HideCharacter = state
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+	
+	task.spawn(function()
+		while RH_Settings.HideCharacter do task.wait()
+			local Char = LocalPlayer.Character
+			local hrp = Char:FindFirstChild("HumanoidRootPart")
+			local hum = Char:FindFirstChild("Humanoid")
+			local TargetPart = game:GetService("Workspace"):FindFirstChild("FurnitureShopCam")
+			if not Char or not hrp or not hum or not TargetPart or PauseHiding then return end
+			
+			if hum.Sit == true then hum.Sit = false end
+			
+			hrp.CFrame = CFrame.new(TargetPart.Position + Vector3.new(0,3.5,0)) * CFrame.Angles(0,math.rad(45),0)
+			hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+			hrp.AssemblyAngularVelocity = Vector3.new(0,0,0)
+			task.wait()
+		end
+		if RH_Settings.HideCharacter == state == false then
+			local Char = LocalPlayer.Character
+			local hrp = Char:FindFirstChild("HumanoidRootPart")
+			if not Char or not hrp then return end
+			
+			hrp.CFrame = game:GetService("Workspace"):FindFirstChildWhichIsA("SpawnLocation").CFrame
+		end
+	end)
+end})
+
+local EditWalkspeedToggle = Misc_SectionPlayer:AddToggle({Name = "Custom Walkspeed",Default = false,Callback = function(state)
+	UseCustomWS = state
+	while UseCustomWS do task.wait()
+		local Char = LocalPlayer.Character
+		local hum = Char:FindFirstChild("Humanoid")
+		if not Char or not hum then return end
+		hum.WalkSpeed = SliderWalkspeed
+	end
+	if UseCustomWS == state == false then
+		local Char = LocalPlayer.Character
+		local hum = Char:FindFirstChild("Humanoid")
+		if not Char or not hum then return end
+		hum.WalkSpeed = 16
+	end
+end})
+
+local WalkspeedSlider = Misc_SectionPlayer:AddSlider({Name = "Walkspeed",Min = 0,Max = 50,Default = 16,Increment = 1,Callback = function(value)
+	SliderWalkspeed = value
+end})
+
+
 
 ClassRemote.OnClientEvent:Connect(function()
 	if RH_Settings.AutoAttend then
@@ -414,9 +492,12 @@ InstructionRemote.OnClientEvent:Connect(function(...)
 		if args[1] == "Art" then
 			local ownEasel = getEasel().Canvas
 			local character = LocalPlayer.Character
+			PauseHiding = true
 			task.wait()
 			character:WaitForChild("HumanoidRootPart").CFrame = getEasel():WaitForChild("Seat").CFrame
-			character:WaitForChild("Paint Brush")
+			local Paintbrush = character:FindFirstChild("Paint Brush")
+			if not Paintbrush then repeat task.wait() Paintbrush = character:FindFirstChild("Paint Brush") until Paintbrush end
+			
 			task.wait()
 			local ClassLocation = workspace:FindFirstChild("ArtClassReal")
 			if not ClassLocation then repeat task.wait() ClassLocation = workspace:FindFirstChild("ArtClassReal") until ClassLocation end
@@ -432,6 +513,7 @@ InstructionRemote.OnClientEvent:Connect(function(...)
 				end
 			end
 			task.wait()
+			PauseHiding = false
 		end
 	end
 end)
@@ -441,12 +523,11 @@ local function WinPE()
 	if not ClassModel then repeat task.wait() ClassModel = game:GetService("Workspace"):FindFirstChild("PE") until ClassModel end
 	
 	local PEBell = ClassModel:FindFirstChild("Bell")
-	if not PEBell then repeat task.wait() PEBell = game:GetService("Workspace"):FindFirstChild("Bell") until PEBell end
+	if not PEBell then repeat task.wait() PEBell = ClassModel:FindFirstChild("Bell") until PEBell end
 	
 	while PEBell do task.wait()
 		if PEBell then
-			fireclickdetector(PEBell:WaitForChild("ClickDetector"),1)
-			fireclickdetector(PEBell:WaitForChild("ClickDetector"),0)
+			fireclickdetector(PEBell:WaitForChild("ClickDetector"))
 		end
 	end
 end

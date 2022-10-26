@@ -15,11 +15,17 @@ local settingsTable = {
     English = false,
     Music = false,
     Chemistry = false,
+	ChemistryMinWait = 4,
+	ChemistryMaxWait = 7.5,
     PE = false,
     Computer = false,
+	ComputerMinWait = 6.5,
+	ComputerMaxWait = 8,
     Swimming = false,
     Baking = false,
     Art = false,
+	ArtMinWait = 0.6,
+	ArtMaxWait = 0.85,
     Lunch = false,
     Breakfast = false,
     Dance = false,
@@ -42,6 +48,12 @@ end
 
 local RH_Settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
 
+for i,v in pairs(settingsTable) do
+	if RH_Settings[i] == nil then
+		RH_Settings[i] = v
+	end
+end
+
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
@@ -56,12 +68,14 @@ local ReplicatedClasses = ReplicatedStorage:WaitForChild("Classes")
 local ClassRemote = ReplicatedClasses:WaitForChild("Starting")
 local ArtRemote = ReplicatedStorage:WaitForChild("Tools"):WaitForChild("Paint"):WaitForChild("SetColor")
 local EnglishRemote = ReplicatedClasses:WaitForChild("English")
+local ComputerRemote = ReplicatedClasses:WaitForChild("Computer")
 local InstructionRemote = ReplicatedClasses:WaitForChild("Instructions")
 local ChemistryRemote = ReplicatedClasses:WaitForChild("Chemistry")
 local CodeRemote = RepLockerFolder:WaitForChild("Code")
 local AbandonRemote = RepLockerFolder:WaitForChild("Abandon")
 local ContentFunction = RepLockerFolder:WaitForChild("Contents")
 local PlayerLocker = LocalPlayer:WaitForChild("Locker")
+local ChatBar = PlayerGui:WaitForChild("Chat"):WaitForChild("Frame"):WaitForChild("ChatBarParentFrame"):WaitForChild("Frame"):WaitForChild("BoxFrame"):WaitForChild("Frame"):WaitForChild("ChatBar")
 local wordList = {"Amateur","Wednesday","Until","a lot","Dessert","Embarrassing","Enough","Argument","February","Library","Tongue","Camouflage","Accommodate","Beautiful"}
 
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
@@ -105,6 +119,26 @@ local ClassChemistry = Farming_ClassSection:AddToggle({Name = "Chemistry Class",
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
+local ChemistryWaitMin = Farming_ClassSection:AddTextbox({Name = "Minimum wait to complete", Default = RH_Settings.ChemistryMinWait,TextDisappear = false,Callback = function(value)
+	if type(tonumber(value)) ~= "number" or tonumber(value) < 0 or tonumber(value) > RH_Settings.ChemistryMaxWait then
+        OrionLib:MakeNotification({Name = "Art", Content = "The inputted wait time is invalid.", Icon = "", Time = 5})
+        return
+    end
+	
+	RH_Settings.ChemistryMinWait = tonumber(value)
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+end})
+
+local ChemistryWaitMax = Farming_ClassSection:AddTextbox({Name = "Maximum wait to complete", Default = RH_Settings.ChemistryMaxWait,TextDisappear = false,Callback = function(value)
+	if type(tonumber(value)) ~= "number" or tonumber(value) < 0 then
+        OrionLib:MakeNotification({Name = "Art", Content = "The inputted wait time is invalid.", Icon = "", Time = 5})
+        return
+    end
+	
+	RH_Settings.ChemistryMaxWait = tonumber(value)
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+end})
+
 local ClassSwimming = Farming_ClassSection:AddToggle({Name = "Swimming Class", Default = RH_Settings.Swimming, Callback = function(state)
     RH_Settings.Swimming = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
@@ -120,6 +154,26 @@ local ClassComputer = Farming_ClassSection:AddToggle({Name = "Computer Class", D
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
+local ComputerWaitMin = Farming_ClassSection:AddTextbox({Name = "Minimum wait per sentence", Default = RH_Settings.ComputerMinWait,TextDisappear = false,Callback = function(value)
+	if type(tonumber(value)) ~= "number" or tonumber(value) < 0 or tonumber(value) > RH_Settings.ComputerMaxWait then
+        OrionLib:MakeNotification({Name = "Art", Content = "The inputted wait time is invalid.", Icon = "", Time = 5})
+        return
+    end
+	
+	RH_Settings.ComputerMinWait = tonumber(value)
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+end})
+
+local ChemistryWaitMax = Farming_ClassSection:AddTextbox({Name = "Maximum wait per sentence", Default = RH_Settings.ChemistryMaxWait,TextDisappear = false,Callback = function(value)
+	if type(tonumber(value)) ~= "number" or tonumber(value) < 0 then
+        OrionLib:MakeNotification({Name = "Art", Content = "The inputted wait time is invalid.", Icon = "", Time = 5})
+        return
+    end
+	
+	RH_Settings.ChemistryMaxWait = tonumber(value)
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+end})
+
 local ClassPE = Farming_ClassSection:AddToggle({Name = "PE Class", Default = RH_Settings.PE, Callback = function(state)
     RH_Settings.PE = state
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
@@ -132,6 +186,26 @@ end})
 
 local ClassArt = Farming_ClassSection:AddToggle({Name = "Art Class", Default = RH_Settings.Art, Callback = function(state)
     RH_Settings.Art = state
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+end})
+
+local ArtWaitMin = Farming_ClassSection:AddTextbox({Name = "Minimum wait per square", Default = RH_Settings.ArtMinWait,TextDisappear = false,Callback = function(value)
+	if type(tonumber(value)) ~= "number" or tonumber(value) < 0 or tonumber(value) > RH_Settings.ArtMaxWait then
+        OrionLib:MakeNotification({Name = "Art", Content = "The inputted wait time is invalid.", Icon = "", Time = 5})
+        return
+    end
+	
+	RH_Settings.ArtMinWait = tonumber(value)
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
+end})
+
+local ArtWaitMax = Farming_ClassSection:AddTextbox({Name = "Maximum wait per square", Default = RH_Settings.ArtMaxWait,TextDisappear = false,Callback = function(value)
+	if type(tonumber(value)) ~= "number" or tonumber(value) < 0 then
+        OrionLib:MakeNotification({Name = "Art", Content = "The inputted wait time is invalid.", Icon = "", Time = 5})
+        return
+    end
+	
+	RH_Settings.ArtMaxWait = tonumber(value)
     writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings)) --update config
 end})
 
@@ -283,6 +357,73 @@ EnglishRemote.OnClientEvent:Connect(function(...)
 					end
 				end
 			end
+		end
+	end
+end)
+
+ChemistryRemote.OnClientEvent:Connect(function(value)
+	if RH_Settings.Chemistry then
+		if value == "StartRound" then
+			local i=0
+			repeat i=i+task.wait() until i>=(math.random(RH_Settings.ChemistryMinWait*100,RH_Settings.ChemistryMaxWait*100)/100) --lower chance of suspicion :D
+			ChemistryRemote:FireServer("SequenceDone")
+		end
+	end
+end)
+
+ComputerRemote.OnClientEvent:Connect(function(p1)
+	if RH_Settings.Computer then
+		if p1 ~= true and p1 ~= false then
+			local p1=tostring(p1)
+			local TtW = #p1/(math.random(RH_Settings.ComputerMinWait*100,RH_Settings.ComputerMaxWait*100)/100)
+			task.wait(TtW)
+			lockwindow()
+			ChatBar:CaptureFocus()
+			task.wait()
+			ChatBar:SetTextFromInput(p1)
+			keyclick(Enum.KeyCode.Return)
+			task.wait()
+			ChatBar:ReleaseFocus()
+			unlockwindow()
+		end
+	end
+end)
+
+local function getEasel()
+	local ClassLocation = workspace:FindFirstChild("ArtClassReal")
+	if not ClassLocation then repeat task.wait() ClassLocation = workspace:FindFirstChild("ArtClassReal") until ClassLocation end
+	
+	for _,Easel in pairs(ClassLocation:GetChildren()) do
+		if Easel.Name == "Easel" and Easel:WaitForChild("Owner").Value == LocalPlayer then
+			return Easel
+		end
+	end
+end
+
+InstructionRemote.OnClientEvent:Connect(function(...)
+	if RH_Settings.Art then
+		local args = {...}
+		if args[1] == "Art" then
+			local ownEasel = getEasel().Canvas
+			local character = LocalPlayer.Character
+			task.wait()
+			character:WaitForChild("HumanoidRootPart").CFrame = getEasel():WaitForChild("Seat").CFrame
+			character:WaitForChild("Paint Brush")
+			task.wait()
+			local ClassLocation = workspace:FindFirstChild("ArtClassReal")
+			if not ClassLocation then repeat task.wait() ClassLocation = workspace:FindFirstChild("ArtClassReal") until ClassLocation end
+			
+			for u = 1,5 do --total of 25
+				for i = 1,5 do
+					task.wait((math.random(RH_Settings.ArtMinWait*100,RH_Settings.ArtMaxWait*100))/100)
+					local MainEasel = ClassLocation.MainEasel.CanvasToCopy
+					local CurrentTile = MainEasel[tostring(u..","..i)] 
+					local EaselTile = ownEasel[tostring(u..","..i)] 
+					local TileColor = CurrentTile.BrickColor.Number
+					ArtRemote:FireServer(EaselTile,BrickColor.new(TileColor))
+				end
+			end
+			task.wait()
 		end
 	end
 end)

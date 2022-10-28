@@ -14,6 +14,10 @@ local SliderWalkspeed = 16
 local PauseHiding = false
 
 local settingsTable = {
+    HideResultUI = true,
+	DisableRendering = false,
+	FPSCap = 60,
+	EnableAntiAFK = true,
     HideCharacter = false,
     AutoAttend = true,
     AutoFarm = true,
@@ -25,7 +29,7 @@ local settingsTable = {
     English = true,
     Music = true,
     Chemistry = true,
-    ChemistryMinWait = 4,
+    ChemistryMinWait = 4.5,
     ChemistryMaxWait = 7.5,
     PE = true,
     Computer = true,
@@ -47,13 +51,10 @@ local fName = "ConConfigs"
 local FileName = "RoyaleHigh.txt"
 local fullFileName = fName.."\\"..FileName
 
-if not isfolder(fName) then
-    print("Could not find configuration folder, creating a new one.")
-   makefolder(fName) 
-end
+if not isfolder(fName) then makefolder(fName) end
+
 if not isfile(fullFileName) or isfile(fullFileName) and readfile(fullFileName) == "" then
-    print("Configuration file for this game is missing or broken, creating a new one.")
-    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settingsTable))
+	writefile(fullFileName,game:GetService("HttpService"):JSONEncode(settingsTable))
 end
 
 local RH_Settings = game:GetService("HttpService"):JSONDecode(readfile(fullFileName))
@@ -70,6 +71,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 if not LocalPlayer.Character then LocalPlayer.CharacterAdded:Wait() end
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local TriggerCaptcha = ReplicatedStorage:WaitForChild("CaptchaRemote"):WaitForChild("TriggerCaptcha")
 local SolvedCaptcha = ReplicatedStorage:WaitForChild("CaptchaRemote"):WaitForChild("SolvedRemoteEvent")
 local CurrentClass = ReplicatedStorage:WaitForChild("CurrentActivity")
@@ -119,6 +121,15 @@ task.spawn(function()
 		fireclickdetector(HomeworkCollector)
 	end)	
 end)
+
+local function ResultUIHide()
+	for _,name in ipairs(PlayerGui:GetChildren()) do
+		if name.Name == "Leaderboard" and name:IsA("ScreenGui") then
+			name:Destroy()
+		end
+	end
+end
+
 
 local Main = OrionLib:MakeWindow({Name = "Royale High - Classic", HidePremium = true, SaveConfig = false, ConfigFolder = fName, IntroEnabled = false,Icon = "rbxassetid://4469750911"})
 
@@ -382,7 +393,19 @@ local HideCharacterToggle = Misc_SectionPlayer:AddToggle({Name = "Hide Character
 	end)
 end})
 
-local EditWalkspeedToggle = Misc_SectionPlayer:AddToggle({Name = "Custom Walkspeed",Default = false,Callback = function(state)
+local ToggleAntiAFK = Misc_SectionPlayer:AddToggle({Name = "Enable Anti-AFK",Default = RH_Settings.EnableAntiAFK,Callback = function(state)
+	RH_Settings.EnableAntiAFK = state
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings))
+	
+	task.spawn(function()
+		for _, v in next, getconnections(LocalPlayer.Idled) do
+			setconnectionenabled(v,RH_Settings.EnableAntiAFK)
+		end
+	end)
+end})
+
+
+local EditWalkspeedToggle = Misc_SectionPlayer:AddToggle({Name = "Custom WalkSpeed",Default = false,Callback = function(state)
 	UseCustomWS = state
 	while UseCustomWS do task.wait()
 		local Char = LocalPlayer.Character
@@ -398,11 +421,42 @@ local EditWalkspeedToggle = Misc_SectionPlayer:AddToggle({Name = "Custom Walkspe
 	end
 end})
 
-local WalkspeedSlider = Misc_SectionPlayer:AddSlider({Name = "Walkspeed",Min = 0,Max = 50,Default = 16,Increment = 1,Callback = function(value)
+local WalkspeedSlider = Misc_SectionPlayer:AddSlider({Name = "WalkSpeed",Min = 0,Max = 50,Default = 16,Increment = 1,Callback = function(value)
 	SliderWalkspeed = value
 end})
 
+local WalkspeedLabel = Misc_SectionPlayer:AddLabel("NOTE: Custom WalkSpeed settings do not save.")
 
+local Misc_SectionUI = MiscTab:AddSection({Name = "UI"})
+
+local ToggleResultUI = Misc_SectionUI:AddToggle({Name = "Hide Results UI",Default = RH_Settings.HideResultUI, Callback = function(state)
+	RH_Settings.HideResultUI = state
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings))
+	
+	task.spawn(function()
+		while RH_Settings.HideResultUI do task.wait()
+			ResultUIHide()
+		end
+	end)
+end})
+
+local Misc_SectionRendering = MiscTab:AddSection({Name = "Rendering"})
+
+local ToggleGPURendering = Misc_SectionRendering:AddToggle({Name = "Disable Rendering",Default = RH_Settings.DisableRendering,Callback = function(state)
+	RH_Settings.DisableRendering = state
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings))
+	
+	RunService:Set3dRenderingEnabled((not RH_Settings.DisableRendering))
+end})
+
+local SliderFPSCap = Misc_SectionRendering:AddSlider({Name = "FPS Limit",Min = 1,Max = 60,Default = RH_Settings.FPSCap, Callback = function(value)
+	RH_Settings.FPSCap = value
+    writefile(fullFileName,game:GetService("HttpService"):JSONEncode(RH_Settings))
+	
+	setfpscap(RH_Settings.FPSCap)
+end})
+
+Misc_SectionRendering:AddLabel("NOTE: Make sure 'Unlock FPS' is enabled.")
 
 ClassRemote.OnClientEvent:Connect(function()
 	if RH_Settings.AutoAttend then
@@ -415,8 +469,8 @@ ClassRemote.OnClientEvent:Connect(function()
 end)
 
 TriggerCaptcha.OnClientEvent:Connect(function(Bubble)
-	if RH_Settings.AntiBubble	then
-		for i=1,3 do
+	if RH_Settings.AntiBubble then
+		for i = 1,3 do
 			SolvedCaptcha:FireServer("FloatingBubble_" .. i, Bubble)
 		end
 		task.wait()
@@ -451,8 +505,7 @@ end)
 ChemistryRemote.OnClientEvent:Connect(function(value)
 	if RH_Settings.Chemistry then
 		if value == "StartRound" then
-			local i=0
-			repeat i=i+task.wait() until i>=(math.random(RH_Settings.ChemistryMinWait*100,RH_Settings.ChemistryMaxWait*100)/100) --lower chance of suspicion :D
+			task.wait((math.random(RH_Settings.ChemistryMinWait*100,RH_Settings.ChemistryMaxWait*100)/100))
 			ChemistryRemote:FireServer("SequenceDone")
 		end
 	end
@@ -462,8 +515,7 @@ ComputerRemote.OnClientEvent:Connect(function(p1)
 	if RH_Settings.Computer then
 		if p1 ~= true and p1 ~= false then
 			local p1=tostring(p1)
-			local TtW = #p1/(math.random(RH_Settings.ComputerMinWait*100,RH_Settings.ComputerMaxWait*100)/100)
-			task.wait(TtW)
+			task.wait(#p1/(math.random(RH_Settings.ComputerMinWait*100,RH_Settings.ComputerMaxWait*100)/100))
 			lockwindow()
 			ChatBar:CaptureFocus()
 			task.wait()
@@ -526,9 +578,12 @@ local function WinPE()
 	local PEBell = ClassModel:FindFirstChild("Bell")
 	if not PEBell then repeat task.wait() PEBell = ClassModel:FindFirstChild("Bell") until PEBell end
 	
+	local Bell = PEBell:FindFirstChild("Bell")
+	if not Bell then repeat task.wait() Bell = PEBell:FindFirstChild("Bell") until Bell end
+			
 	while PEBell do task.wait()
-		if PEBell then
-			fireclickdetector(PEBell:WaitForChild("ClickDetector"))
+		if Bell then
+			fireclickdetector(Bell)
 		end
 	end
 end
